@@ -37,7 +37,7 @@ app.use(morgan("dev"));
 
 ///routes
 app.get("/", (req, res) => {
-  res.send("growEasy backend is listening on port....");
+  res.send("edu-project backend is listening on port....");
 });
 
 
