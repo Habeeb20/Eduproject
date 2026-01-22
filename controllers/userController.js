@@ -16,13 +16,13 @@ export const registerSuperAdmin = async (req, res) => {
 
   try {
     // Check if any user exists
-    const existingUser = await User.countDocuments();
-    if (existingUser > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Super Admin already exists! This route is only for first-time setup."
-      });
-    }
+    // const existingUser = await User.countDocuments();
+    // if (existingUser > 0) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Super Admin already exists! This route is only for first-time setup."
+    //   });
+    // }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -82,6 +82,17 @@ export const login = async (req, res) => {
 
 
 
+export const dashboard = async(req, res) =>{
+  const userId = req.user._id || req.user.id
+
+  try {
+    const user = await User.findOne(userId)
+    return res.status(200).json({ user})
+  } catch (error) {
+   console.log(error)
+   return res.status(500).json() 
+  }
+}
 
 
 
