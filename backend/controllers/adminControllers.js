@@ -530,3 +530,25 @@ export const getAllUsersForSuperadmin = asyncHandler(async (req, res) => {
     users: result,
   });
 });
+
+
+
+
+
+
+export const getSuperadminStats = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const stats = {
+    admins: await User.countDocuments({ role: 'admin' }),
+    teachers: await User.countDocuments({ role: 'teacher' }),
+    students: await User.countDocuments({ role: 'student' }),
+    parents: await User.countDocuments({ role: 'parent' }),
+    accountants: await User.countDocuments({ role: 'accountant' }),
+    librarians: await User.countDocuments({ role: 'librarian' }),
+  };
+
+  res.json({ success: true, stats });
+});

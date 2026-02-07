@@ -51,7 +51,8 @@ import express from 'express';
 import { createSchoolAdmin,   createTeacher,
   createStudentWithParent,
   createStaffMember,
-  getAllUsersForSuperadmin, } from '../controllers/adminControllers.js';
+  getAllUsersForSuperadmin,
+  getSuperadminStats, } from '../controllers/adminControllers.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 const adminRouter = express.Router();
@@ -101,4 +102,6 @@ adminRouter.post(
   createStudentWithParent
 );
 
+
+adminRouter.get('/superadmin-stats', protect, authorize('superadmin'), getSuperadminStats);
 export default adminRouter;
