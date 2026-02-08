@@ -52,7 +52,11 @@ import { createSchoolAdmin,   createTeacher,
   createStudentWithParent,
   createStaffMember,
   getAllUsersForSuperadmin,
-  getSuperadminStats, } from '../controllers/adminControllers.js';
+  getSuperadminStats,
+  login,
+  getAllUsersInSchool,
+  updateUser,
+  deleteUser, } from '../controllers/adminControllers.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 const adminRouter = express.Router();
@@ -81,14 +85,14 @@ adminRouter.get(
 adminRouter.post(
   '/create-teacher',
   protect,
-  authorize(['admin', 'superadmin']),
+  authorize('admin', 'superadmin'),
   createTeacher
 );
 
 adminRouter.post(
   '/create-staff',
   protect,
-  authorize(['admin', 'superadmin']),
+  authorize('admin', 'superadmin'),
   createStaffMember
 );
 
@@ -98,10 +102,15 @@ adminRouter.post(
 adminRouter.post(
   '/create-student',
   protect,
-  authorize('admin'),
+  authorize('admin', 'superadmin'),
   createStudentWithParent
 );
 
 
 adminRouter.get('/superadmin-stats', protect, authorize('superadmin'), getSuperadminStats);
+adminRouter.get('/users/school', protect, authorize('superadmin'), getAllUsersInSchool);
+adminRouter.put('/users/:id', protect, authorize(['admin', 'superadmin']), updateUser);
+adminRouter.delete('/users/:id', protect, authorize(['admin', 'superadmin']), deleteUser);
+
+adminRouter.post("/login", login)
 export default adminRouter;

@@ -1,270 +1,9 @@
-// // controllers/userController.js
-// import User from '../models/User.js';
-// import bcrypt from 'bcryptjs';
-// import generateToken from '../utils/generateToken.js';
-// import 'colors';
-
-// export const createAdmin = async (req, res) => {
-//   const { name, email, password, phone } = req.body;
-
-//   try {
-//     // Check if admin already exists
-//     const adminExists = await User.findOne({ role: 'admin' });
-//     if (adminExists) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'School Admin already exists! Only one Admin allowed per school.'.yellow
-//       });
-//     }
-
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password, salt);
-
-//     const admin = await User.create({
-//       name,
-//       email: email.toLowerCase(),
-//       password: hashedPassword,
-//       phone,
-//       role: 'admin',
-//       createdBy: req.user._id, // Created by Super Admin
-//       schoolName: req.user.schoolName // Inherit from Super Admin
-//     });
-
-//     console.log(`Admin Created: ${admin.name} by Super Admin ${req.user.name}`.green.bold);
-
-//     res.status(201).json({
-//       success: true,
-//       message: 'School Admin created successfully!',
-//       user: {
-//         id: admin._id,
-//         name: admin.name,
-//         email: admin.email,
-//         role: admin.role,
-//         schoolName: admin.schoolName
-//       }
-//     });
-
-//   } catch (error) {
-//     console.log('Create Admin Error:'.red, error.message);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-
-
-// export const createTeacher = async (req, res) => {
-//   const { name, email, password, phone, subjects } = req.body;
-
-//   try {
-//     // Check if teacher already exists
-//     const teacherExists = await User.findOne({ email });
-//     if (teacherExists) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Teacher with this email already exists!'.yellow
-//       });
-//     }
-
-//     // Generate Teacher ID: TCH-001, TCH-002...
-//     const count = await User.countDocuments({ role: 'teacher' });
-//     const teacherId = `TCH-${String(count + 1).padStart(3, '0')}`;
-
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password || 'teacher123', salt); // default password if not given
-
-//     const teacher = await User.create({
-//       name,
-//       email: email.toLowerCase(),
-//       password: hashedPassword,
-//       phone,
-//       role: 'teacher',
-//       teacherId, // custom field
-//       subjects: subjects || [], // array of subjects they teach
-//       createdBy: req.user._id,
-//       schoolName: req.user.schoolName
-//     });
-
-//     console.log(`TEACHER CREATED → ${teacher.name} (${teacher.teacherId}) by ${req.user.role.toUpperCase()} ${req.user.name}`.cyan.bold);
-
-//     res.status(201).json({
-//       success: true,
-//       message: 'Teacher created successfully!',
-//       teacher: {
-//         id: teacher._id,
-//         teacherId: teacher.teacherId,
-//         name: teacher.name,
-//         email: teacher.email,
-//         phone: teacher.phone,
-//         subjects: teacher.subjects,
-//         schoolName: teacher.schoolName
-//       }
-//     });
-
-//   } catch (error) {
-//     console.log('Create Teacher Error:'.red, error.message);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-
-
-// // controllers/userController.js → ADD THIS BEAST FUNCTION
-
-// export const createStudentAndParent = async (req, res) => {
-//   const {
-//     studentName,
-//     studentEmail,
-//     studentClass,
-//     section,
-//     rollNumber,
-//     parentName,
-//     parentEmail,
-//     parentPhone,
-//     parentPassword = 'parent123' // default, they can change later
-//   } = req.body;
-
-//   try {
-//     // Generate IDs
-//     const studentCount = await User.countDocuments({ role: 'student' });
-//     const parentCount = await User.countDocuments({ role: 'parent' });
-
-//     const studentId = `STD-${String(studentCount + 1).padStart(3, '0')}`;
-//     const parentId = `PAR-${String(parentCount + 1).padStart(3, '0')}`;
-
-//     // Hash parent password
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(parentPassword, salt);
-
-//     // Create Parent First
-//     const parent = await User.create({
-//       name: parentName,
-//       email: parentEmail.toLowerCase(),
-//       password: hashedPassword,
-//       phone: parentPhone,
-//       role: 'parent',
-//       parentId,
-//       schoolName: req.user.schoolName,
-//       createdBy: req.user._id
-//     });
-
-//     // Create Student & Link to Parent
-//     const student = await User.create({
-//       name: studentName,
-//       email: studentEmail?.toLowerCase() || null,
-//       role: 'student',
-//       studentId,
-//       class: studentClass,
-//       section,
-//       rollNumber,
-//       parent: parent._id,           // Student → Parent link
-//       schoolName: req.user.schoolName,
-//       createdBy: req.user._id
-//     });
-
-//     // Link Student back to Parent
-//     parent.children = [student._id];
-//     await parent.save();
-
-//     console.log(`STUDENT & PARENT CREATED`.bgMagenta.bold);
-//     console.log(`Student: ${student.name} (${student.studentId}) → Class ${studentClass}`.green);
-//     console.log(`Parent: ${parent.name} (${parent.parentId}) → Linked!`.cyan);
-
-//     res.status(201).json({
-//       success: true,
-//       message: 'Student + Parent created and linked successfully!',
-//       student: {
-//         id: student._id,
-//         studentId: student.studentId,
-//         name: student.name,
-//         class: student.class,
-//         section: student.section,
-//         rollNumber: student.rollNumber
-//       },
-//       parent: {
-//         id: parent._id,
-//         parentId: parent.parentId,
-//         name: parent.name,
-//         email: parent.email,
-//         phone: parent.phone,
-//         loginPassword: parentPassword // Show once (in real app: send via email)
-//       }
-//     });
-
-//   } catch (error) {
-//     console.log('Create Student+Parent Error:'.red, error.message);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-
-
-
-// export const createStaff = async (req, res) => {
-//   const { name, email, password, phone, role } = req.body;
-
-//   // Only allow these two roles
-//   if (!['accountant', 'librarian'].includes(role)) {
-//     return res.status(400).json({
-//       success: false,
-//       message: 'Invalid role! Use accountant or librarian'.red
-//     });
-//   }
-
-//   try {
-//     // Check if email already exists
-//     const exists = await User.findOne({ email: email.toLowerCase() });
-//     if (exists) {
-//       return res.status(400).json({
-//         success: false,
-//         message: `${role.charAt(0).toUpperCase() + role.slice(1)} with this email already exists!`.yellow
-//       });
-//     }
-
-//     // Generate Staff ID
-//     const count = await User.countDocuments({ role });
-//     const staffPrefix = role === 'accountant' ? 'ACC' : 'LIB';
-//     const staffId = `${staffPrefix}-${String(count + 1).padStart(3, '0')}`;
-
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password || `${role}123`, salt);
-
-//     const staff = await User.create({
-//       name,
-//       email: email.toLowerCase(),
-//       password: hashedPassword,
-//       phone,
-//       role,
-//       [`${role}Id`]: staffId, // accountantId or librarianId
-//       schoolName: req.user.schoolName,
-//       createdBy: req.user._id
-//     });
-
-//     console.log(`${role.toUpperCase()} CREATED → ${staff.name} (${staffId})`.rainbow.bold);
-
-//     res.status(201).json({
-//       success: true,
-//       message: `${role.charAt(0).toUpperCase() + role.slice(1)} created successfully!`,
-//       staff: {
-//         id: staff._id,
-//         staffId: staffId,
-//         name: staff.name,
-//         email: staff.email,
-//         phone: staff.phone,
-//         role: staff.role,
-//         loginPassword: password || `${role}123` // show once (in prod: send via email)
-//       }
-//     });
-
-//   } catch (error) {
-//     console.log(`Create ${role} Error:`.red, error.message);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
 
 // controllers/adminController.js
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
 
 // ──────────────────────────────────────────────
 // 1. Superadmin creates school admin
@@ -314,6 +53,7 @@ export const createSchoolAdmin = asyncHandler(async (req, res) => {
 // 2. Admin / Superadmin creates teacher
 // ──────────────────────────────────────────────
 export const createTeacher = asyncHandler(async (req, res) => {
+  console.log(req.user)
   if (!['admin', 'superadmin'].includes(req.user.role)) {
     return res.status(403).json({ success: false, message: 'Unauthorized' });
   }
@@ -363,7 +103,10 @@ export const createTeacher = asyncHandler(async (req, res) => {
 // ──────────────────────────────────────────────
 // 3. Admin / Superadmin creates student + parent
 // ──────────────────────────────────────────────
+
+
 export const createStudentWithParent = asyncHandler(async (req, res) => {
+  // Only admin or superadmin can create students
   if (!['admin', 'superadmin'].includes(req.user.role)) {
     return res.status(403).json({ success: false, message: 'Unauthorized' });
   }
@@ -372,35 +115,64 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
     studentName,
     studentEmail,
     studentClass,
-    section,
-    rollNumber,
+    rollNumberPrefix, // optional from frontend (ignored - we generate it)
     parentName,
     parentEmail,
     parentPhone,
+    password, // ← now required from frontend
   } = req.body;
 
-  // Check duplicates
-  if (studentEmail && await User.findOne({ email: studentEmail.toLowerCase() })) {
-    return res.status(400).json({ success: false, message: 'Student email exists' });
+  // Validate required fields
+  if (!studentName || !studentClass || !parentName || !parentEmail || !parentPhone || !password) {
+    return res.status(400).json({ success: false, message: 'All required fields must be provided' });
+  }
+
+  // Check for duplicate emails
+  if (studentEmail && (await User.findOne({ email: studentEmail.toLowerCase() }))) {
+    return res.status(400).json({ success: false, message: 'Student email already exists' });
   }
   if (await User.findOne({ email: parentEmail.toLowerCase() })) {
-    return res.status(400).json({ success: false, message: 'Parent email exists' });
+    return res.status(400).json({ success: false, message: 'Parent email already exists' });
   }
 
-  const studentCount = await User.countDocuments({ role: 'student', schoolName: req.user.schoolName });
-  const parentCount = await User.countDocuments({ role: 'parent', schoolName: req.user.schoolName });
+  // ──────────────────────────────────────────────
+  // Auto-generate Roll Number
+  // Format: First 2 letters of schoolName (uppercase) + 2-digit sequential number
+  // ──────────────────────────────────────────────
+  const schoolName = req.user.schoolName || 'Unknown School';
+  const prefix = schoolName.substring(0, 2).toUpperCase(); // e.g., "LA" from "Lagos..."
 
-  const studentId = `STD-${String(studentCount + 1).padStart(4, '0')}`;
-  const parentId = `PAR-${String(parentCount + 1).padStart(4, '0')}`;
+  // Count existing students in this school to get next number
+  const studentCount = await User.countDocuments({
+    role: 'student',
+    schoolName: req.user.schoolName,
+  });
 
-  const parentPlainPassword = 'parent123'; // TODO: Generate random in prod
-  const parentHashed = await bcrypt.hash(parentPlainPassword, 10);
+  const nextNumber = String(studentCount + 1).padStart(2, '0'); // 01, 02, ..., 10, 11...
+  const studentRollNumber = `${prefix}${nextNumber}`; // e.g., LA01, LA02
 
+  // ──────────────────────────────────────────────
+  // Hash parent's password (sent from frontend)
+  // ──────────────────────────────────────────────
+  const parentHashedPassword = await bcrypt.hash(password, 10);
+
+  // ──────────────────────────────────────────────
+  // Generate IDs
+  // ──────────────────────────────────────────────
+  const studentCountTotal = await User.countDocuments({ role: 'student' });
+  const parentCountTotal = await User.countDocuments({ role: 'parent' });
+
+  const studentId = `STD-${String(studentCountTotal + 1).padStart(4, '0')}`;
+  const parentId = `PAR-${String(parentCountTotal + 1).padStart(4, '0')}`;
+
+  // ──────────────────────────────────────────────
+  // Create Parent
+  // ──────────────────────────────────────────────
   const parent = await User.create({
     name: parentName,
     email: parentEmail.toLowerCase(),
-    password: parentHashed,
-    tempPlainPassword: parentPlainPassword,
+    password: parentHashedPassword,
+    tempPlainPassword: req.user.role === 'superadmin' ? password : undefined, // only superadmin sees it
     phone: parentPhone,
     role: 'parent',
     parentId,
@@ -408,46 +180,51 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
     createdBy: req.user._id,
   });
 
+  // ──────────────────────────────────────────────
+  // Create Student
+  // ──────────────────────────────────────────────
   const student = await User.create({
     name: studentName,
     email: studentEmail ? studentEmail.toLowerCase() : null,
     role: 'student',
     studentId,
     class: studentClass,
-    section,
-    rollNumber,
+    rollNumber: studentRollNumber, // auto-generated
     parent: parent._id,
     schoolName: req.user.schoolName,
     createdBy: req.user._id,
   });
 
+  // Link parent to student
   parent.children = [student._id];
   await parent.save();
 
+  // ──────────────────────────────────────────────
+  // Response
+  // ──────────────────────────────────────────────
   res.status(201).json({
     success: true,
-    message: 'Student and parent created',
+    message: 'Student and parent created successfully',
     student: {
       _id: student._id,
-      studentId,
-      name: studentName,
-      class: studentClass,
-      section,
-      rollNumber,
+      studentId: student.studentId,
+      name: student.name,
+      class: student.class,
+      rollNumber: student.rollNumber, // e.g., LA01
       schoolName: student.schoolName,
     },
     parent: {
       _id: parent._id,
-      parentId,
-      name: parentName,
-      email: parentEmail,
-      phone: parentPhone,
+      parentId: parent.parentId,
+      name: parent.name,
+      email: parent.email,
+      phone: parent.phone,
       schoolName: parent.schoolName,
-      temporaryPassword: req.user.role === 'superadmin' ? parentPlainPassword : undefined,
+      // Only superadmin sees the plain password
+      temporaryPassword: req.user.role === 'superadmin' ? password : undefined,
     },
   });
 });
-
 // ──────────────────────────────────────────────
 // 4. Admin / Superadmin creates staff (accountant/librarian)
 // ──────────────────────────────────────────────
@@ -510,7 +287,7 @@ export const getAllUsersForSuperadmin = asyncHandler(async (req, res) => {
     return res.status(403).json({ success: false, message: 'Unauthorized' });
   }
 
-  const users = await User.find({}).select('+tempPlainPassword');
+  const users = await User.find({ createdBy: req.user._id }).select('+tempPlainPassword');
 
   const result = users.map((u) => ({
     _id: u._id,
@@ -552,3 +329,182 @@ export const getSuperadminStats = asyncHandler(async (req, res) => {
 
   res.json({ success: true, stats });
 });
+
+
+
+
+
+
+
+// ──────────────────────────────────────────────
+// Get ALL users in the superadmin's school (including those created by admins)
+// ──────────────────────────────────────────────
+export const getAllUsersInSchool = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Only superadmin can access this' });
+  }
+
+  const users = await User.find({ schoolName: req.user.schoolName })
+    .select('+tempPlainPassword')
+    .populate({
+      path: 'createdBy',
+      select: 'name email role'
+    })
+    .sort({ createdAt: -1 });
+
+  const result = users.map(u => ({
+    ...u.toObject(),
+    createdByName: u.createdBy?.name || 'Superadmin',
+    createdByEmail: u.createdBy?.email || req.user.email,
+    createdByRole: u.createdBy?.role || 'superadmin',
+    temporaryPassword: u.tempPlainPassword || '(changed)'
+  }));
+
+  res.json({
+    success: true,
+    total: result.length,
+    users: result
+  });
+});
+
+// ──────────────────────────────────────────────
+// Edit any user (superadmin or the admin who created it)
+// ──────────────────────────────────────────────
+export const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+
+  // Permission check
+  const isSuperadmin = req.user.role === 'superadmin';
+  const isCreator = user.createdBy?.toString() === req.user._id.toString();
+
+  if (!isSuperadmin && !isCreator) {
+    return res.status(403).json({ success: false, message: 'You do not have permission to edit this user' });
+  }
+
+  // Prevent changing role or schoolName for safety
+  delete updates.role;
+  delete updates.schoolName;
+
+  // If password is being changed, hash it
+  if (updates.password) {
+    updates.password = await bcrypt.hash(updates.password, 10);
+    updates.tempPlainPassword = updates.password; // only superadmin sees it
+    updates.needsPasswordReset = false;
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+
+  res.json({
+    success: true,
+    message: 'User updated successfully',
+    user: updatedUser
+  });
+});
+
+// ──────────────────────────────────────────────
+// Delete any user (superadmin or creator)
+// ──────────────────────────────────────────────
+export const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+
+  // Permission check
+  const isSuperadmin = req.user.role === 'superadmin';
+  const isCreator = user.createdBy?.toString() === req.user._id.toString();
+
+  if (!isSuperadmin && !isCreator) {
+    return res.status(403).json({ success: false, message: 'No permission to delete this user' });
+  }
+
+  // Prevent deleting superadmin or self
+  if (user.role === 'superadmin' || user._id.toString() === req.user._id.toString()) {
+    return res.status(403).json({ success: false, message: 'Cannot delete superadmin or yourself' });
+  }
+
+  await User.findByIdAndDelete(id);
+
+  res.json({ success: true, message: 'User deleted successfully' });
+});
+
+
+
+export const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  // 1. Validate input
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email and password are required'
+    });
+  }
+
+  // 2. Find user by email (case-insensitive)
+  const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid email or password'
+    });
+  }
+
+ 
+
+  // 3. Check if account is active
+  if (!user.isActive) {
+    return res.status(403).json({
+      success: false,
+      message: 'Your account is deactivated. Contact support.'
+    });
+  }
+
+  // 4. Verify password
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid email or password'
+    });
+  }
+
+  // 5. Generate JWT token
+  const token = jwt.sign(
+    {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      schoolName: user.schoolName
+    },
+    process.env.JWT_SECRET || 'your-very-secure-secret-key',
+    { expiresIn: '30d' }
+  );
+
+  // 6. Send response (do NOT send password or sensitive fields)
+  res.json({
+    success: true,
+    message: 'Login successful',
+    token,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      schoolName: user.schoolName,
+      // Add other safe fields if needed (phone, etc.)
+    }
+  });
+});
+
+
+
+

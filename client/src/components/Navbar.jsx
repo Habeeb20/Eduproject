@@ -46,6 +46,15 @@ export default function Navbar() {
               Home
             </Link>
 
+              <Link
+              to="/login/user"
+              className="block text-gray-700 hover:text-[#1890ff] py-2 font-medium"
+        
+            >
+              Login as a user
+            </Link>
+
+
             {isAuthenticated ? (
               <div className="flex items-center space-x-6">
                 <Link
@@ -123,6 +132,13 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               Home
+            </Link>
+            <Link
+              to="/login/user"
+              className="block text-gray-700 hover:text-[#1890ff] py-2 font-medium"
+              onClick={() => setIsOpen(false)}
+            >
+              Login as a user
             </Link>
 
             {isAuthenticated ? (

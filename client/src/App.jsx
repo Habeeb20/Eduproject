@@ -13,6 +13,8 @@ import CreateTeacherForm from './pages/dashboard/Create/CreateTeacherForm';
 import CreateStudentParentForm from './pages/dashboard/Create/CreateStudentParentForm';
 import CreateAdminForm from './pages/dashboard/Create/CreateAdminForm';
 import CreateStaffForm from './pages/dashboard/Create/CreateStaffForm';
+import SuperadminUsersStats from './pages/dashboard/superAdmin/SuperAdminStats';
+import LoginPageForUser from './pages/dashboard/LoginPageForUser';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -48,6 +50,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
+
+           <Route path="/login/user" element={<LoginPageForUser />} />
+
         {/* Protected Dashboard – everything nested under DashboardLayout */}
         <Route path="/dashboard" element={<DashboardLayout />}>
           {/* Default page when visiting /dashboard */}
@@ -58,6 +63,7 @@ function App() {
           <Route path="create-teacher" element={<CreateTeacherForm />} />
           <Route path="create-admin" element={<CreateAdminForm />} />
           <Route path="create-staff" element={<CreateStaffForm />} />
+          <Route path="statistics" element={<SuperadminUsersStats />} />
           <Route path="all-users" element={<SuperadminDashboardOverview />} />
 
           {/* Other sections (use placeholders for now) */}

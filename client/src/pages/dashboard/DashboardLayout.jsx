@@ -48,22 +48,32 @@ export default function DashboardLayout() {
       case 'superadmin':
         return [
           { path: '/dashboard', label: 'Overview', icon: Home },
+          { path: '/dashboard/statistics', label: 'Stats', icon: Home },
           { path: '/dashboard/create-admin', label: 'Create Admin', icon: UserPlus },
           { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen },
           { path: '/dashboard/create-student', label: 'Add Student', icon: Users },
           { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase },
           { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck },
+          { path: '/dashboard/students', label: 'Students', icon: Users },
+          { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen },
+          { path: '/dashboard/classes', label: 'Classes', icon: Calendar },
+          { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
+          { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign },
           ...baseItems,
         ];
 
       case 'admin':
         return [
           { path: '/dashboard', label: 'Dashboard', icon: Home },
+
           { path: '/dashboard/students', label: 'Students', icon: Users },
           { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen },
           { path: '/dashboard/classes', label: 'Classes', icon: Calendar },
           { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
           { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign },
+           { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen },
+          { path: '/dashboard/create-student', label: 'Add Student', icon: Users },
+          { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase },
           { path: '/dashboard/reports', label: 'Reports', icon: FileText },
           ...baseItems,
         ];
@@ -145,13 +155,13 @@ export default function DashboardLayout() {
 
         {/* Logout at bottom */}
         <div className="absolute bottom-8 left-0 right-0 px-6">
-          <button
+          {/* <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-3 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
-          </button>
+          </button> */}
         </div>
       </aside>
 

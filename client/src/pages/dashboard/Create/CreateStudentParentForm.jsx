@@ -2,13 +2,14 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
-
+import { toast } from 'sonner';
 const PRIMARY_BLUE = '#1890ff';
 
 export default function CreateStudentParentForm() {
   const [studentName, setStudentName] = useState('');
   const [studentEmail, setStudentEmail] = useState('');
   const [studentClass, setStudentClass] = useState('');
+  const [password, setPassword] = useState('');
   const [section, setSection] = useState('');
   const [rollNumber, setRollNumber] = useState('');
   const [parentName, setParentName] = useState('');
@@ -26,26 +27,28 @@ export default function CreateStudentParentForm() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/admin/create-student`,
+        `${import.meta.env.VITE_BACKEND_URL}/admin/create-student`,
         { 
-          studentName, studentEmail, studentClass, section, rollNumber,
+          studentName, studentEmail, studentClass, section,password, rollNumber,
           parentName, parentEmail, parentPhone
         },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-
+toast.success('Student and parent created successfully!')
       setSuccess('Student and parent created successfully!');
       console.log('Created details:', response.data);
       // Reset form
       setStudentName('');
       setStudentEmail('');
       setStudentClass('');
+      setPassword('')
       setSection('');
       setRollNumber('');
       setParentName('');
       setParentEmail('');
       setParentPhone('');
     } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create student and parent')
       setError(err.response?.data?.message || 'Failed to create student and parent');
     } finally {
       setIsLoading(false);
@@ -108,9 +111,20 @@ export default function CreateStudentParentForm() {
                 disabled={isLoading}
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[#1890ff] focus:ring-1 focus:ring-[#1890ff]/30"
+                required
+                disabled={isLoading}
+              />
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
                 <input
                   type="text"
@@ -132,7 +146,7 @@ export default function CreateStudentParentForm() {
                   required
                   disabled={isLoading}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

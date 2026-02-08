@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
 
 const PRIMARY_BLUE = '#1890ff';
 
@@ -23,11 +24,11 @@ export default function CreateStaffForm() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/admin/create-staff`,
+        `${import.meta.env.VITE_BACKEND_URL}/admin/create-staff`,
         { name, email, password, phone, role },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-
+toast.success(`${role.charAt(0).toUpperCase() + role.slice(1)} created successfully!`)
       setSuccess(`${role.charAt(0).toUpperCase() + role.slice(1)} created successfully!`);
       console.log('Created staff details:', response.data.staff);
       // Reset form
@@ -37,6 +38,7 @@ export default function CreateStaffForm() {
       setPhone('');
       setRole('accountant');
     } catch (err) {
+      toast.err(err.response?.data?.message || 'Failed to create staff')
       setError(err.response?.data?.message || 'Failed to create staff');
     } finally {
       setIsLoading(false);

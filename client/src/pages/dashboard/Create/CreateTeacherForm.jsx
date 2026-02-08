@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
-
+import { toast } from 'sonner';
 const PRIMARY_BLUE = '#1890ff';
 
 export default function CreateTeacherForm() {
@@ -23,12 +23,13 @@ export default function CreateTeacherForm() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/admin/create-teacher`,
+        `${import.meta.env.VITE_BACKEND_URL}/admin/create-teacher`,
         { name, email, password, phone, subjects: subjects.split(',').map(s => s.trim()) },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
 
       setSuccess('Teacher created successfully!');
+      toast.success("Teacher created successfully")
       console.log('Created teacher details:', response.data.teacher);
       // Reset form
       setName('');
@@ -37,7 +38,9 @@ export default function CreateTeacherForm() {
       setPhone('');
       setSubjects('');
     } catch (err) {
+
       setError(err.response?.data?.message || 'Failed to create teacher');
+      toast.error(err.response?.data?.message || 'Failed to create teacher');
     } finally {
       setIsLoading(false);
     }

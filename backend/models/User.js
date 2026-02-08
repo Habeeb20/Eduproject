@@ -50,7 +50,8 @@ tempPlainPassword: {
     passwordLastChanged: {
       type: Date,
     },
-
+// models/User.js (add this field if you want)
+needsPasswordReset: { type: Boolean, default: false },
 
     isActive: { type: Boolean, default: true },
 

@@ -35,11 +35,14 @@ export const protect = async (req, res, next) => {
 
 // Restrict to specific roles
 export const authorize = (...roles) => {
+
   return (req, res, next) => {
+      console.log(req.user)
+      console.log(roles)
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: `Access denied! ${req.user.role} cannot perform this action`.red.bold
+        message: `Access denied! ${req.user.role} cannot perform this action`
       });
     }
     next();
