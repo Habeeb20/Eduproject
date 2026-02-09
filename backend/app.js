@@ -9,6 +9,7 @@ import { connectDb } from "./db.js";
 import adminRouter from "./routes/adminRoutes.js";
 import parentRouter from "./routes/parentRoutes.js";
 import classRouter from "./routes/classRoute.js";
+import paymentrouter from "./routes/paymentRoute.js"
 import attendanceRouter from "./routes/attendanceRoutes.js"
 dotenv.config();
 
@@ -47,11 +48,11 @@ app.use("/api/parents", parentRouter)
 app.use("/api/classes", classRouter)
 app.use("/api/attendance", attendanceRouter)
 
-
+app.use("/api/payment", paymentrouter)
 
 
 // Start server
-const port = process.env.PORT || 2020;
+const port = process.env.PORT || 2000;
 
 app.listen(port, async () => {
   console.log(`Server is running on port ${port}`);

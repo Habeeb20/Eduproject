@@ -36,6 +36,7 @@ export default function LoginPage() {
 
       navigate('/dashboard');
     } catch (err) {
+      console.log(err)
       const errorMessage =
         err.response?.data?.message ||
         err.message ||

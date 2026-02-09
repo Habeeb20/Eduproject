@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import 'colors';
 
+import asyncHandler from 'express-async-handler';
+
+
 // Protect routes - verify JWT
 export const protect = async (req, res, next) => {
   let token;
@@ -48,3 +51,85 @@ export const authorize = (...roles) => {
     next();
   };
 };
+
+
+
+
+
+export const checkSubscription = asyncHandler(async (req, res, next) => {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+  let superadminUser;
+
+  if (req.user.role === 'superadmin') {
+    superadminUser = req.user;
+  } else {
+    // Find superadmin of this user's school
+    superadminUser = await User.findOne({
+      role: 'superadmin',
+      schoolName: req.user.schoolName
+    });
+  }
+
+  if (!superadminUser) {
+    return res.status(403).json({ message: 'No superadmin found for this school' });
+  }
+
+  const now = new Date();
+  if (superadminUser.subscriptionStatus !== 'active' || now > superadminUser.subscriptionEnd) {
+    return res.status(403).json({
+      success: false,
+      message: 'Subscription expired. Please renew to continue using the system.'
+    });
+  }
+
+  next();
+});
+
+
+
+
+
+
+export const checkSuperadminSubscription = asyncHandler(async (req, res, next) => {
+  // Skip check for superadmin himself
+  if (req.user.role === 'superadmin') {
+    return next();
+  }
+
+  // Get the superadmin of this user's school
+  const superadmin = await User.findOne({
+    role: 'superadmin',
+    schoolName: req.user.schoolName,
+  });
+
+  if (!superadmin) {
+    return res.status(403).json({
+      success: false,
+      message: 'No superadmin found for this school. Contact support.',
+    });
+  }
+
+  const now = new Date();
+
+  // Check subscription status
+  if (
+    superadmin.subscriptionStatus !== 'active' ||
+    !superadmin.subscriptionEnd ||
+    now > new Date(superadmin.subscriptionEnd)
+  ) {
+    return res.status(403).json({
+      success: false,
+      message:
+        'This school\'s subscription has expired or is inactive. ' +
+        'Please contact your superadmin to renew the subscription.',
+      subscriptionExpired: true,
+      subscriptionEnd: superadmin.subscriptionEnd
+        ? superadmin.subscriptionEnd.toISOString()
+        : null,
+    });
+  }
+
+  // Subscription is valid → proceed
+  next();
+});

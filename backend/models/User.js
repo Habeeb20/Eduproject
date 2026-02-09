@@ -50,14 +50,76 @@ tempPlainPassword: {
     passwordLastChanged: {
       type: Date,
     },
-// models/User.js (add this field if you want)
+
 needsPasswordReset: { type: Boolean, default: false },
 
     isActive: { type: Boolean, default: true },
 
     lastLogin: Date,
+    
+    subscriptionType: {
+    type: String,
+    enum: ['quarterly', 'annual', null],
+    default: null,
   },
+  subscriptionStart: {
+    type: Date,
+  },
+  subscriptionEnd: {
+    type: Date,
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ['active', 'expired', 'pending'],
+    default: 'pending',
+  },
+  // Payment history (array for tracking)
+  payments: [{
+    amount: { type: Number },
+    reference: { type: String },
+    date: { type: Date, default: Date.now },
+    status: { type: String, enum: ['pending', 'success', 'failed'] },
+  }],
+  },
+
   { timestamps: true }
 );
 
 export default mongoose.model('User', userSchema);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
