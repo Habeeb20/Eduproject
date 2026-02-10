@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/initialize', protect, authorize('superadmin'), initializePayment);
 
 // Verify after redirect (frontend calls this)
-router.get('/verify/:reference', protect, authorize('superadmin'), verifyPayment);
+router.get('/verify/:reference',   verifyPayment);
 
 // Paystack webhook (no auth – Paystack calls this)
 router.post('/webhook', paystackWebhook);

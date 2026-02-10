@@ -15,6 +15,7 @@ import CreateAdminForm from './pages/dashboard/Create/CreateAdminForm';
 import CreateStaffForm from './pages/dashboard/Create/CreateStaffForm';
 import SuperadminUsersStats from './pages/dashboard/superAdmin/SuperAdminStats';
 import LoginPageForUser from './pages/dashboard/LoginPageForUser';
+import SubscriptionPage from './pages/dashboard/superAdmin/SubscribtionPage';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -57,6 +58,9 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           {/* Default page when visiting /dashboard */}
           <Route index element={<Placeholder title="Dashboard Overview" />} />
+
+              {/*Super Admin */}
+                <Route path="plans" element={<SubscriptionPage/>} />
 
           {/* Creation forms */}
           <Route path="create-student" element={<CreateStudentParentForm />} />

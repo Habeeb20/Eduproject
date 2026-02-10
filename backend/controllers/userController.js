@@ -71,7 +71,10 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        schoolName: user.schoolName
+        schoolName: user.schoolName,
+        subscriptionStatus: user.subscriptionStatus,
+        subscriptionEnd: user.subscriptionEnd
+
       }
     });
 
@@ -363,4 +366,52 @@ export const deleteUser = async (req, res) => {
     console.error("Delete User Error:".red, error.message);
     res.status(500).json({ success: false, message: error.message });
   }
+};
+
+
+export const getCurrentUser = async (req, res) => {
+  // req.user is already set by your protect middleware
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authenticated',
+    });
+  }
+
+  // Return safe user data (never send password or sensitive fields)
+  const user = await User.findById(req.user._id).select(
+    '-password -tempPlainPassword' // exclude sensitive fields
+  );
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found',
+    });
+  }
+
+  res.json({
+    success: true,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      schoolName: user.schoolName,
+      phone: user.phone,
+
+      subscriptionType: user.subscriptionType,
+      subscriptionStart: user.subscriptionStart,
+      subscriptionEnd: user.subscriptionEnd,
+      subscriptionStatus: user.subscriptionStatus,
+    
+    },
+    subscription:{
+      
+      subscriptionType: user.subscriptionType,
+      subscriptionStart: user.subscriptionStart,
+      subscriptionEnd: user.subscriptionEnd,
+      subscriptionStatus: user.subscriptionStatus,
+    }
+  });
 };

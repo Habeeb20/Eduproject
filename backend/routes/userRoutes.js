@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerSuperAdmin, login, getSchoolOverview, getAllTeachers, getAllStudents, getAllParents, getAllClasses, getAllResults, getSchoolStaff, editUser, deleteUser } from '../controllers/userController.js';
+import { registerSuperAdmin, login, getSchoolOverview, getAllTeachers, getAllStudents, getAllParents, getAllClasses, getAllResults, getSchoolStaff, editUser, deleteUser, getCurrentUser } from '../controllers/userController.js';
 import { authorize, protect } from '../middleware/auth.js';
 
 
@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post('/register-superadmin', registerSuperAdmin);
 router.post('/login', login);
+router.get('/me', protect, getCurrentUser)
 router.get('/overview', protect, authorize('superadmin'), getSchoolOverview);
 router.get('/teachers', protect, authorize('superadmin'), getAllTeachers);
 router.get('/students', protect, authorize('superadmin'), getAllStudents);

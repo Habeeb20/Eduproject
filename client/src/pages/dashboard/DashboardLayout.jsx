@@ -38,70 +38,86 @@ export default function DashboardLayout() {
   };
 
   // Define sidebar items based on role
-  const getSidebarItems = (role) => {
-    const baseItems = [
-      { path: '/dashboard', label: 'Dashboard', icon: Home },
-      { path: '/dashboard/settings', label: 'Settings', icon: Settings },
-    ];
+const getSidebarItems = (role) => {
+  const isSubscriptionActive =
+    localStorage.getItem('subscriptionStatus') === 'active' &&
+    new Date(localStorage.getItem('subscriptionEnd')) > new Date();
 
-    switch (role?.toLowerCase()) {
-      case 'superadmin':
-        return [
-          { path: '/dashboard', label: 'Overview', icon: Home },
-          { path: '/dashboard/statistics', label: 'Stats', icon: Home },
-          { path: '/dashboard/create-admin', label: 'Create Admin', icon: UserPlus },
-          { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen },
-          { path: '/dashboard/create-student', label: 'Add Student', icon: Users },
-          { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase },
-          { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck },
-          { path: '/dashboard/students', label: 'Students', icon: Users },
-          { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen },
-          { path: '/dashboard/classes', label: 'Classes', icon: Calendar },
-          { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
-          { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign },
-          ...baseItems,
-        ];
+  const baseItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: Home },
+    { path: '/dashboard/settings', label: 'Settings', icon: Settings },
+  ];
 
-      case 'admin':
-        return [
-          { path: '/dashboard', label: 'Dashboard', icon: Home },
+  let items = [];
 
-          { path: '/dashboard/students', label: 'Students', icon: Users },
-          { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen },
-          { path: '/dashboard/classes', label: 'Classes', icon: Calendar },
-          { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
-          { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign },
-           { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen },
-          { path: '/dashboard/create-student', label: 'Add Student', icon: Users },
-          { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase },
-          { path: '/dashboard/reports', label: 'Reports', icon: FileText },
-          ...baseItems,
-        ];
+  switch (role?.toLowerCase()) {
+    case 'superadmin':
+      items = [
+        { path: '/dashboard', label: 'Overview', icon: Home },
+        { path: '/dashboard/statistics', label: 'Stats', icon: Home },
+        { path: '/dashboard/plans', label: 'Subscription Plans', icon: DollarSign },
+        // Always show subscription plans
+        { path: '/dashboard/create-admin', label: 'Create Admin', icon: UserPlus, restricted: true },
+        { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen, restricted: true },
+        { path: '/dashboard/create-student', label: 'Add Student', icon: Users, restricted: true },
+        { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase, restricted: true },
+        { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck, restricted: true },
+        { path: '/dashboard/students', label: 'Students', icon: Users, restricted: true },
+        { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen, restricted: true },
+        { path: '/dashboard/classes', label: 'Classes', icon: Calendar, restricted: true },
+        { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar, restricted: true },
+        { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
+      ];
+      break;
 
-      case 'teacher':
-        return [
-          { path: '/dashboard', label: 'Dashboard', icon: Home },
-          { path: '/dashboard/my-classes', label: 'My Classes', icon: BookOpen },
-          { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
-          { path: '/dashboard/grades', label: 'Grades', icon: FileText },
-          ...baseItems,
-        ];
+    case 'admin':
+      items = [
+        { path: '/dashboard', label: 'Dashboard', icon: Home },
+        { path: '/dashboard/students', label: 'Students', icon: Users, restricted: true },
+        { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen, restricted: true },
+        { path: '/dashboard/classes', label: 'Classes', icon: Calendar, restricted: true },
+        { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar, restricted: true },
+        { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
+        { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen, restricted: true },
+        { path: '/dashboard/create-student', label: 'Add Student', icon: Users, restricted: true },
+        { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase, restricted: true },
+        { path: '/dashboard/reports', label: 'Reports', icon: FileText, restricted: true },
+      ];
+      break;
 
-      case 'student':
-      case 'parent':
-        return [
-          { path: '/dashboard', label: 'Dashboard', icon: Home },
-          { path: '/dashboard/profile', label: 'My Profile', icon: User },
-          { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
-          { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
-          ...baseItems,
-        ];
+    // Teacher, Student, Parent - no restricted items for now
+    case 'teacher':
+      items = [
+        { path: '/dashboard', label: 'Dashboard', icon: Home },
+        { path: '/dashboard/my-classes', label: 'My Classes', icon: BookOpen },
+        { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
+        { path: '/dashboard/grades', label: 'Grades', icon: FileText },
+        ...baseItems,
+      ];
+      break;
 
-      default:
-        return baseItems;
-    }
-  };
+    case 'student':
+    case 'parent':
+      items = [
+        { path: '/dashboard', label: 'Dashboard', icon: Home },
+        { path: '/dashboard/profile', label: 'My Profile', icon: User },
+        { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
+        { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
+        ...baseItems,
+      ];
+      break;
 
+    default:
+      items = baseItems;
+  }
+
+  // Filter out restricted items if subscription is expired
+  if (!isSubscriptionActive) {
+    items = items.filter(item => !item.restricted);
+  }
+
+  return items;
+};
   const sidebarItems = user ? getSidebarItems(user.role) : [];
 
   if (!user) {

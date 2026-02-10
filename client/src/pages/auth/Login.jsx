@@ -33,7 +33,9 @@ export default function LoginPage() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user || {}));
-
+// After successful login or fetch user
+localStorage.setItem('subscriptionStatus', data.user.subscriptionStatus);
+localStorage.setItem('subscriptionEnd', data.user.subscriptionEnd);
       navigate('/dashboard');
     } catch (err) {
       console.log(err)

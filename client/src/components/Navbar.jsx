@@ -46,13 +46,13 @@ export default function Navbar() {
               Home
             </Link>
 
-              <Link
+              {/* <Link
               to="/login/user"
               className="block text-gray-700 hover:text-[#1890ff] py-2 font-medium"
         
             >
               Login as a user
-            </Link>
+            </Link> */}
 
 
             {isAuthenticated ? (
@@ -133,13 +133,13 @@ export default function Navbar() {
             >
               Home
             </Link>
-            <Link
+            {/* <Link
               to="/login/user"
               className="block text-gray-700 hover:text-[#1890ff] py-2 font-medium"
               onClick={() => setIsOpen(false)}
             >
               Login as a user
-            </Link>
+            </Link> */}
 
             {isAuthenticated ? (
               <>

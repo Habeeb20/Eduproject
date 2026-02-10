@@ -28,7 +28,7 @@ export const initializePayment = asyncHandler(async (req, res) => {
         email,
         amount: amount * 100, // convert to kobo
         reference,
-        callback_url: `${process.env.FRONTEND_URL}/dashboard/subscription/callback`, // your frontend callback page
+        callback_url: `${process.env.BACKEND_URL}/api/payment/verify/${reference}`, // your frontend callback page
       },
       {
         headers: {
@@ -111,31 +111,48 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     const { status, amount } = paystackRes.data.data;
 
     if (status === 'success') {
-      // Update user (same as webhook logic)
+      // Find user by payment reference
       const user = await User.findOne({ 'payments.reference': reference });
-      if (user) {
-        const payment = user.payments.find(p => p.reference === reference);
-        payment.status = 'success';
-
-        const type = (amount / 100) === 50000 ? 'quarterly' : 'annual';
-        const durationMonths = type === 'quarterly' ? 3 : 12;
-
-        user.subscriptionType = type;
-        user.subscriptionStart = new Date();
-        user.subscriptionEnd = new Date(user.subscriptionStart);
-        user.subscriptionEnd.setMonth(user.subscriptionEnd.getMonth() + durationMonths);
-        user.subscriptionStatus = 'active';
-
-        await user.save();
-
-        res.json({ success: true, message: 'Subscription activated' });
-      } else {
-        res.status(404).json({ success: false, message: 'User not found' });
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
       }
+
+      // Update payment status
+      const payment = user.payments.find(p => p.reference === reference);
+      payment.status = 'success';
+
+      // Determine subscription type and duration
+      const type = (amount / 100) === 50000 ? 'quarterly' : 'annual';
+      const durationMonths = type === 'quarterly' ? 3 : 12;
+
+      // Activate subscription
+      user.subscriptionType = type;
+      user.subscriptionStart = new Date();
+      user.subscriptionEnd = new Date(user.subscriptionStart);
+      user.subscriptionEnd.setMonth(user.subscriptionEnd.getMonth() + durationMonths);
+      user.subscriptionStatus = 'active';
+
+      await user.save();
+
+      // === REDIRECT TO FRONTEND PLANS PAGE ===
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const redirectUrl = `${frontendUrl}/dashboard/plans?payment=success&reference=${reference}`;
+
+      return res.redirect(redirectUrl);
     } else {
-      res.status(400).json({ success: false, message: 'Payment not successful' });
+      // Payment not successful → redirect with failure
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const redirectUrl = `${frontendUrl}/dashboard/plans?payment=failed&reference=${reference}`;
+
+      return res.redirect(redirectUrl);
     }
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Verification failed' });
+    console.error('Payment verification error:', err);
+
+    // In case of server error → still redirect with error
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const redirectUrl = `${frontendUrl}/dashboard/plans?payment=error`;
+
+    return res.redirect(redirectUrl);
   }
 });

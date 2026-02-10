@@ -92,12 +92,12 @@ export const checkSubscription = asyncHandler(async (req, res, next) => {
 
 
 export const checkSuperadminSubscription = asyncHandler(async (req, res, next) => {
-  // Skip check for superadmin himself
+  // Superadmin himself can always access (to renew)
   if (req.user.role === 'superadmin') {
     return next();
   }
 
-  // Get the superadmin of this user's school
+  // Find the superadmin of this school
   const superadmin = await User.findOne({
     role: 'superadmin',
     schoolName: req.user.schoolName,
@@ -112,7 +112,7 @@ export const checkSuperadminSubscription = asyncHandler(async (req, res, next) =
 
   const now = new Date();
 
-  // Check subscription status
+  // Check if subscription is active
   if (
     superadmin.subscriptionStatus !== 'active' ||
     !superadmin.subscriptionEnd ||
@@ -120,9 +120,7 @@ export const checkSuperadminSubscription = asyncHandler(async (req, res, next) =
   ) {
     return res.status(403).json({
       success: false,
-      message:
-        'This school\'s subscription has expired or is inactive. ' +
-        'Please contact your superadmin to renew the subscription.',
+      message: 'School subscription has expired. Please contact your superadmin to renew.',
       subscriptionExpired: true,
       subscriptionEnd: superadmin.subscriptionEnd
         ? superadmin.subscriptionEnd.toISOString()
@@ -130,6 +128,5 @@ export const checkSuperadminSubscription = asyncHandler(async (req, res, next) =
     });
   }
 
-  // Subscription is valid → proceed
   next();
 });
