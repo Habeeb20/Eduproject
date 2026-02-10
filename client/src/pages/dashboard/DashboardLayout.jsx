@@ -4,6 +4,7 @@ import { useNavigate, Outlet } from 'react-router-dom';
 import {
   Home, Users, BookOpen, Calendar, DollarSign, FileText, Settings,
   LogOut, Menu, X, Bell, UserPlus, Briefcase, UserCheck,
+  CardSim,
 } from 'lucide-react';
 
 export default function DashboardLayout() {
@@ -67,6 +68,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/classes', label: 'Classes', icon: Calendar, restricted: true },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar, restricted: true },
         { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
+        { path: '/dashboard/digital-ids', label: 'Digital IDs', icon: CardSim, restricted: true },
       ];
       break;
 
@@ -82,6 +84,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/create-student', label: 'Add Student', icon: Users, restricted: true },
         { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase, restricted: true },
         { path: '/dashboard/reports', label: 'Reports', icon: FileText, restricted: true },
+        { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
       ];
       break;
 
@@ -92,6 +95,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/my-classes', label: 'My Classes', icon: BookOpen },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
         { path: '/dashboard/grades', label: 'Grades', icon: FileText },
+           { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
         ...baseItems,
       ];
       break;
@@ -103,6 +107,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/profile', label: 'My Profile', icon: User },
         { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
+           { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
         ...baseItems,
       ];
       break;

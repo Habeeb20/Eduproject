@@ -19,6 +19,34 @@ router.get("/staff", protect, authorize('superadmin'), getSchoolStaff)
 router.put('/edit-user/:userId', editUser);
 router.delete('/delete-user/:userId', deleteUser);
 
+// GET /verify?id=<userId>&code=<uniqueCode>
+router.get('/verify', async (req, res) => {
+  const { id, code } = req.query;
+
+  if (!id || !code) {
+    return res.status(400).json({ success: false, message: 'Missing parameters' });
+  }
+
+  const user = await User.findById(id).select('name email role schoolName profilePicture digitalId');
+
+  if (!user || user.digitalId?.uniqueCode !== code) {
+    return res.status(404).json({ success: false, message: 'Invalid or expired ID' });
+  }
+
+  res.json({
+    success: true,
+    user: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      schoolName: user.schoolName,
+      profilePicture: user.profilePicture,
+      uniqueCode: user.digitalId.uniqueCode,
+      issuedAt: user.digitalId.issuedAt,
+    },
+  });
+});
+
 export default router;
 
 

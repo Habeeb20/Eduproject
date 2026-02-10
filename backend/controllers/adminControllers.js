@@ -4,6 +4,7 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import { generateDigitalId } from '../utils/generateDigitalId.js';
 
 // ──────────────────────────────────────────────
 // 1. Superadmin creates school admin
@@ -33,6 +34,7 @@ export const createSchoolAdmin = asyncHandler(async (req, res) => {
     schoolName,
     createdBy: req.user._id,
   });
+    const digitalId = await generateDigitalId(admin);
 
   res.status(201).json({
     success: true,
@@ -44,6 +46,7 @@ export const createSchoolAdmin = asyncHandler(async (req, res) => {
       phone: admin.phone,
       role: admin.role,
       schoolName: admin.schoolName,
+      digitalId,
       temporaryPassword: plainPassword, // Superadmin sees it
     },
   });
@@ -83,6 +86,7 @@ export const createTeacher = asyncHandler(async (req, res) => {
     schoolName: req.user.schoolName,
     createdBy: req.user._id,
   });
+  const digitalId = await generateDigitalId(teacher);
 
   res.status(201).json({
     success: true,
@@ -95,6 +99,7 @@ export const createTeacher = asyncHandler(async (req, res) => {
       phone: teacher.phone,
       subjects: teacher.subjects,
       schoolName: teacher.schoolName,
+      digitalId,
       temporaryPassword: req.user.role === 'superadmin' ? plainPassword : undefined,
     },
   });
@@ -106,6 +111,10 @@ export const createTeacher = asyncHandler(async (req, res) => {
 
 
 export const createStudentWithParent = asyncHandler(async (req, res) => {
+
+  try {
+    
+
   // Only admin or superadmin can create students
   if (!['admin', 'superadmin'].includes(req.user.role)) {
     return res.status(403).json({ success: false, message: 'Unauthorized' });
@@ -135,10 +144,7 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Parent email already exists' });
   }
 
-  // ──────────────────────────────────────────────
-  // Auto-generate Roll Number
-  // Format: First 2 letters of schoolName (uppercase) + 2-digit sequential number
-  // ──────────────────────────────────────────────
+
   const schoolName = req.user.schoolName || 'Unknown School';
   const prefix = schoolName.substring(0, 2).toUpperCase(); // e.g., "LA" from "Lagos..."
 
@@ -179,7 +185,7 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
     schoolName: req.user.schoolName,
     createdBy: req.user._id,
   });
-
+ 
   // ──────────────────────────────────────────────
   // Create Student
   // ──────────────────────────────────────────────
@@ -187,6 +193,7 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
     name: studentName,
     email: studentEmail ? studentEmail.toLowerCase() : null,
     role: 'student',
+    password: parentHashedPassword,
     studentId,
     class: studentClass,
     rollNumber: studentRollNumber, // auto-generated
@@ -198,7 +205,7 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
   // Link parent to student
   parent.children = [student._id];
   await parent.save();
-
+  const digitalId = await generateDigitalId(student);
   // ──────────────────────────────────────────────
   // Response
   // ──────────────────────────────────────────────
@@ -212,6 +219,7 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
       class: student.class,
       rollNumber: student.rollNumber, // e.g., LA01
       schoolName: student.schoolName,
+      digitalId,
     },
     parent: {
       _id: parent._id,
@@ -220,10 +228,16 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
       email: parent.email,
       phone: parent.phone,
       schoolName: parent.schoolName,
+      digitalId,
       // Only superadmin sees the plain password
       temporaryPassword: req.user.role === 'superadmin' ? password : undefined,
     },
   });
+
+    } catch (error) {
+    console.log(error)
+    return res.status(500).json("an error occurred ")
+  }
 });
 // ──────────────────────────────────────────────
 // 4. Admin / Superadmin creates staff (accountant/librarian)
@@ -262,6 +276,7 @@ export const createStaffMember = asyncHandler(async (req, res) => {
     schoolName: req.user.schoolName,
     createdBy: req.user._id,
   });
+    const digitalId = await generateDigitalId(staff);
 
   res.status(201).json({
     success: true,
@@ -274,6 +289,7 @@ export const createStaffMember = asyncHandler(async (req, res) => {
       phone,
       role,
       schoolName: staff.schoolName,
+      digitalId,
       temporaryPassword: req.user.role === 'superadmin' ? plainPassword : undefined,
     },
   });

@@ -16,6 +16,9 @@ import CreateStaffForm from './pages/dashboard/Create/CreateStaffForm';
 import SuperadminUsersStats from './pages/dashboard/superAdmin/SuperAdminStats';
 import LoginPageForUser from './pages/dashboard/LoginPageForUser';
 import SubscriptionPage from './pages/dashboard/superAdmin/SubscribtionPage';
+import VerifyId from './pages/dashboard/VerifyId';
+import AllDigitalIds from './pages/dashboard/superAdmin/AllDigitalCards';
+import MyDigitalId from './pages/dashboard/MyDigitalId';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -50,7 +53,7 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-
+<Route path="/verify" element={<VerifyId />} />
 
            <Route path="/login/user" element={<LoginPageForUser />} />
 
@@ -79,6 +82,8 @@ function App() {
           <Route path="reports" element={<Placeholder title="Reports & Analytics" />} />
           <Route path="settings" element={<Placeholder title="Settings & Profile" />} />
 
+<Route path="/dashboard/digital-ids" element={<AllDigitalIds />} />         {/* Superadmin/Admin */}
+<Route path="/dashboard/my-id" element={<MyDigitalId />} />               {/* All users */}
           {/* Role-specific dashboards (you can replace placeholders later) */}
           <Route path="superadmin" element={<SuperadminDashboardOverview />} />
           <Route path="admin" element={<AdminDashboard />} />

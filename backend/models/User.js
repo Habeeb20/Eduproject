@@ -80,6 +80,18 @@ needsPasswordReset: { type: Boolean, default: false },
     date: { type: Date, default: Date.now },
     status: { type: String, enum: ['pending', 'success', 'failed'] },
   }],
+
+  digitalId: {
+    uniqueCode: { type: String, unique: true, sparse: true }, // e.g. SCH-123456
+    qrCodeUrl: { type: String }, // Cloudinary or public URL of QR image
+    verificationUrl: { type: String }, // full URL for QR scan
+    issuedAt: { type: Date, default: Date.now },
+  },
+
+  profilePicture: {
+    type: String, // Cloudinary secure URL
+    default: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1/default-avatar.png',
+  },
   },
 
   { timestamps: true }
