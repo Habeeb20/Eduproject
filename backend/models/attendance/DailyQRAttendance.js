@@ -1,11 +1,37 @@
-// models/DailyTeacherQR.js
+// src/models/Attendance.js
 import mongoose from 'mongoose';
 
-const dailyTeacherQRSchema = new mongoose.Schema({
-  date: { type: Date, required: true, unique: true },
-  code: { type: String, required: true }, // e.g. "TQR-20250405"
-  generatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  expiresAt: { type: Date }
-});
+const attendanceSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
+  status: {
+    type: String,
+    enum: ['present', 'late', 'absent'],
+    required: true,
+  },
+  method: {
+    type: String,
+    enum: ['qr_scan', 'unique_code'],
+    required: true,
+  },
+  location: {
+    latitude: Number,
+    longitude: Number,
+  },
+  ipAddress: String, // For backend IP check
+  schoolName: String,
+  createdBy: { // If marked by admin/superadmin manually
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+}, { timestamps: true });
 
-export default mongoose.model('DailyTeacherQR', dailyTeacherQRSchema);
+export default mongoose.model('Attendance', attendanceSchema);
+

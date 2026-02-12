@@ -1,37 +1,24 @@
-// routes/resultRoutes.js
+// routes/markRoutes.js
 import express from 'express';
-import { enterResult, getChildResults, getMyResults, publishResult, saveResult,        // Create OR Update
-  deleteResult,
 
-  unpublishResult, } from '../controllers/resultController.js';
 import { protect, authorize } from '../middleware/auth.js';
-import { protect, authorize } from '../middleware/auth.js';
+import {
+  setMarkSettings,
+  assignSubjectsToTeacher,
+  addMarks,
+  getStudentMarks,
+  getClassMarks,
+  getTeachersForSubjects,
+} from '../controllers/resultController.js';
 
 const router = express.Router();
 
-// Teacher enters result
-router.post('/enter', protect, authorize('teacher', 'admin'), enterResult);
-
-// Publish result
-router.post('/publish', protect, authorize('teacher', 'admin'), publishResult);
-
-// Student sees results
-router.get('/my-results', protect, authorize('student'), getMyResults);
-
-// Parent sees child's results
-router.get('/child-results', protect, authorize('parent'), getChildResults);
-
-
-// Save (Create or Update)
-router.post('/save', protect, authorize('teacher', 'admin'), saveResult);
-
-// Delete result
-router.delete('/:resultId', protect, authorize('teacher', 'admin'), deleteResult);
-
-router.post('/unpublish', protect, authorize('teacher', 'admin'), unpublishResult);
-
-
+router.post('/settings/marks', protect, authorize(['superadmin', 'admin']), setMarkSettings);
+router.post('/assign-subjects', protect, authorize(['admin', 'superadmin']), assignSubjectsToTeacher);
+router.post('/marks', protect, authorize('teacher'), addMarks);
+router.get('/marks/student', protect, getStudentMarks);
+router.get('/marks/student/:studentId', protect, getStudentMarks);
+router.get('/marks/class', protect, authorize(['superadmin', 'admin', 'teacher']), getClassMarks);
+router.get('/teachers/subjects', protect, authorize(['superadmin', 'admin']), getTeachersForSubjects);
 
 export default router;
-
-

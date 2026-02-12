@@ -5,6 +5,8 @@ import {
   Home, Users, BookOpen, Calendar, DollarSign, FileText, Settings,
   LogOut, Menu, X, Bell, UserPlus, Briefcase, UserCheck,
   CardSim,
+  MarsStroke,
+  CircleSlash,
 } from 'lucide-react';
 
 export default function DashboardLayout() {
@@ -62,8 +64,10 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen, restricted: true },
         { path: '/dashboard/create-student', label: 'Add Student', icon: Users, restricted: true },
         { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase, restricted: true },
+              { path: '/dashboard/create-class', label: 'Create Class', icon: CircleSlash, restricted: true },
         { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck, restricted: true },
         { path: '/dashboard/students', label: 'Students', icon: Users, restricted: true },
+        { path: '/dashboard/check-score', label: 'Check Score', icon: MarsStroke, restricted: true },
         { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen, restricted: true },
         { path: '/dashboard/classes', label: 'Classes', icon: Calendar, restricted: true },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar, restricted: true },
@@ -79,10 +83,12 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen, restricted: true },
         { path: '/dashboard/classes', label: 'Classes', icon: Calendar, restricted: true },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar, restricted: true },
+          { path: '/dashboard/check-score', label: 'Check Score', icon: MarsStroke, restricted: true },
         { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
         { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen, restricted: true },
         { path: '/dashboard/create-student', label: 'Add Student', icon: Users, restricted: true },
         { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase, restricted: true },
+        { path: '/dashboard/create-class', label: 'Create Class', icon: CircleSlash, restricted: true },
         { path: '/dashboard/reports', label: 'Reports', icon: FileText, restricted: true },
         { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
       ];
@@ -93,6 +99,7 @@ const getSidebarItems = (role) => {
       items = [
         { path: '/dashboard', label: 'Dashboard', icon: Home },
         { path: '/dashboard/my-classes', label: 'My Classes', icon: BookOpen },
+        { path: '/dashboard/add-score', label: 'Add scores', icon: BookOpen },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
         { path: '/dashboard/grades', label: 'Grades', icon: FileText },
            { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },

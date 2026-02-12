@@ -1,7 +1,7 @@
 import express from 'express';
 import { registerSuperAdmin, login, getSchoolOverview, getAllTeachers, getAllStudents, getAllParents, getAllClasses, getAllResults, getSchoolStaff, editUser, deleteUser, getCurrentUser } from '../controllers/userController.js';
 import { authorize, protect } from '../middleware/auth.js';
-
+import User from '../models/User.js';
 
 const router = express.Router();
 

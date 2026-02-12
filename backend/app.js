@@ -11,6 +11,7 @@ import parentRouter from "./routes/parentRoutes.js";
 import classRouter from "./routes/classRoute.js";
 import paymentrouter from "./routes/paymentRoute.js"
 import attendanceRouter from "./routes/attendanceRoutes.js"
+import markRoutes from "./routes/resultRoutes.js"
 dotenv.config();
 
 connectDb()
@@ -47,7 +48,7 @@ app.use("/api/admin", adminRouter)
 app.use("/api/parents", parentRouter)
 app.use("/api/classes", classRouter)
 app.use("/api/attendance", attendanceRouter)
-
+app.use('/api/marks', markRoutes);
 app.use("/api/payment", paymentrouter)
 
 

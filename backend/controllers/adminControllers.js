@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import { generateDigitalId } from '../utils/generateDigitalId.js';
-
+import Class from '../models/class/classModel.js';
 // ──────────────────────────────────────────────
 // 1. Superadmin creates school admin
 // ──────────────────────────────────────────────
@@ -157,6 +157,18 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
   const nextNumber = String(studentCount + 1).padStart(2, '0'); // 01, 02, ..., 10, 11...
   const studentRollNumber = `${prefix}${nextNumber}`; // e.g., LA01, LA02
 
+
+    const classDoc = await Class.findOne({
+      name: studentClass,
+      schoolName: req.user.schoolName,
+    });
+
+    if (!classDoc) {
+      return res.status(404).json({
+        success: false,
+        message: `Class '${studentClass}' not found in your school`,
+      });
+    }
   // ──────────────────────────────────────────────
   // Hash parent's password (sent from frontend)
   // ──────────────────────────────────────────────
@@ -202,6 +214,9 @@ export const createStudentWithParent = asyncHandler(async (req, res) => {
     createdBy: req.user._id,
   });
 
+
+      classDoc.students.push(student._id);
+    await classDoc.save();
   // Link parent to student
   parent.children = [student._id];
   await parent.save();
@@ -520,6 +535,78 @@ export const login = asyncHandler(async (req, res) => {
     }
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

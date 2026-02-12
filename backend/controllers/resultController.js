@@ -1,253 +1,171 @@
 // controllers/resultController.js
-import Result from '../models/class/resultModel.js';
+import Mark  from '../models/class/resultModel.js';
 import User from '../models/User.js';
 import Class from '../models/class/classModel.js';
+import SchoolSettings from '../models/attendance/schoolSettings.js';
+import asyncHandler from "express-async-handler"
+// ──────────────────────────────────────────────
+// Controllers (attendanceController.js or new markController.js)
+// ──────────────────────────────────────────────
 
-import 'colors';
+// Set Mark Settings (toggle allowTeacherMarkAny)
+export const setMarkSettings = asyncHandler(async (req, res) => {
+  if (!['superadmin', 'admin'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
 
-// TEACHER ENTERS RESULT
-export const enterResult = async (req, res) => {
-  const { studentId, subject, term, session, scores, weights } = req.body;
-  const teacher = req.user;
+  const { allowTeacherMarkAny } = req.body;
 
-  try {
-    let result = await Result.findOne({
+  let settings = await SchoolSettings.findOne({ schoolName: req.user.schoolName });
+  if (!settings) {
+    settings = new SchoolSettings({ schoolName: req.user.schoolName, createdBy: req.user._id });
+  }
+
+  settings.allowTeacherMarkAny = allowTeacherMarkAny;
+  await settings.save();
+
+  res.json({ success: true, settings });
+});
+
+// Assign Subjects to Teacher (admin/superadmin)
+export const assignSubjectsToTeacher = asyncHandler(async (req, res) => {
+  if (!['admin', 'superadmin'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const { teacherId, subjects } = req.body;
+
+  const teacher = await User.findById(teacherId);
+  if (!teacher || teacher.role !== 'teacher') {
+    return res.status(404).json({ success: false, message: 'Teacher not found' });
+  }
+
+  teacher.subjects = subjects;
+  await teacher.save();
+
+  res.json({ success: true, message: 'Subjects assigned' });
+});
+
+// Add/Update Marks (teacher)
+export const addMarks = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'teacher') {
+    return res.status(403).json({ success: false, message: 'Only teachers can add marks' });
+  }
+
+  const { studentId, subject, term, marks, autoPosition } = req.body;
+
+  // Check settings
+  const settings = await SchoolSettings.findOne({ schoolName: req.user.schoolName });
+  if (!settings.allowTeacherMarkAny && !req.user.subjects.includes(subject)) {
+    return res.status(403).json({ success: false, message: 'Not authorized for this subject' });
+  }
+
+  let mark = await Mark.findOne({ student: studentId, subject, term });
+
+  if (!mark) {
+    mark = new Mark({
       student: studentId,
       subject,
+      className: (await User.findById(studentId)).class, // assume student has class field
       term,
-      session
+      teacher: req.user._id,
+      schoolName: req.user.schoolName,
     });
+  }
 
-    if (result) {
-      // Update
-      Object.assign(result, scores);
-      if (weights) result.weights = weights;
-      result.enteredBy = teacher._id;
+  mark.marks.firstTest = marks.firstTest;
+  mark.marks.secondTest = marks.secondTest;
+  mark.marks.thirdTest = marks.thirdTest;
+  mark.marks.midTerm = marks.midTerm;
+  mark.marks.examination = marks.examination;
+  mark.marks.total = 
+    marks.firstTest + marks.secondTest + marks.thirdTest + marks.midTerm + marks.examination;
+  mark.autoPosition = autoPosition;
+
+  await mark.save();
+
+  // If autoPosition true, calculate rank
+  if (autoPosition) {
+    await calculatePositions(mark.className, subject, term);
+  }
+
+  res.json({ success: true, message: 'Marks updated', mark });
+});
+
+// Calculate Positions for Class/Subject/Term
+async function calculatePositions(className, subject, term) {
+  const marks = await Mark.find({ className, subject, term }).sort({ 'marks.total': -1 });
+
+  let position = 1;
+  let previousTotal = null;
+  let positionIncrement = 1;
+
+  for (const mark of marks) {
+    if (previousTotal === mark.marks.total) {
+      // Tie - same position as previous
+      positionIncrement++;
     } else {
-      // Create new
-      result = new Result({
-        student: studentId,
-        subject,
-        term,
-        session,
-        class: (await User.findById(studentId)).currentClass,
-        enteredBy: teacher._id,
-        ...scores,
-        weights
-      });
+      position += positionIncrement;
+      positionIncrement = 1;
     }
 
-    await result.save();
-
-    console.log(`RESULT ENTERED → ${result.studentId} | ${subject} | ${result.total} (${result.grade})`.yellow.bold);
-
-    res.json({
-      success: true,
-      message: "Result saved successfully!",
-      result: {
-        total: result.total,
-        grade: result.grade,
-        published: result.published
-      }
-    });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    mark.marks.position = position;
+    previousTotal = mark.marks.total;
+    await mark.save();
   }
-};
+}
 
-// PUBLISH RESULT
-export const publishResult = async (req, res) => {
-  const { resultId } = req.body;
+// Get Marks for Student (student/parent view)
+export const getStudentMarks = asyncHandler(async (req, res) => {
+  const { studentId } = req.params; // optional for parent
 
-  try {
-    const result = await Result.findById(resultId);
-    if (!result) return res.status(404).json({ success: false, message: "Result not found" });
+  let targetId = req.user._id;
 
-    result.published = true;
-    result.publishedAt = new Date();
-    await result.save();
-
-    console.log(`RESULT PUBLISHED → ${result.studentId} ${result.subject} ${result.grade}`.bgGreen.white.bold);
-
-    res.json({ success: true, message: "Result published! Parents can now see it." });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// STUDENT SEES THEIR RESULTS
-export const getMyResults = async (req, res) => {
-  try {
-    const results = await Result.find({
-      student: req.user._id,
-      published: true
-    }).sort({ term: 1, subject: 1 });
-
-    res.json({ success: true, results });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// PARENT SEES CHILD'S RESULTS
-export const getChildResults = async (req, res) => {
-  try {
-    const children = await User.find({ parent: req.user._id, role: 'student' });
-    const childIds = children.map(c => c._id);
-
-    const results = await Result.find({
-      student: { $in: childIds },
-      published: true
-    })
-    .populate('student', 'name studentId')
-    .sort({ term: 1 });
-
-    res.json({ success: true, results });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-
-
-// TEACHER ENTERS OR UPDATES RESULT
-export const saveResult = async (req, res) => {
-  const { resultId, studentId, subject, term, session, scores, weights } = req.body;
-  const teacher = req.user;
-
-  try {
-    let result;
-
-    if (resultId) {
-      // EDIT EXISTING RESULT
-      result = await Result.findById(resultId);
-      if (!result) {
-        return res.status(404).json({ success: false, message: "Result not found" });
-      }
-
-      // Security: Only the teacher who entered it can edit (or admin)
-      if (!result.enteredBy.equals(teacher._id) && teacher.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false, 
-          message: "You can only edit results you entered!" 
-        });
-      }
-
-      // Allow editing even after publish? No — block if published
-      if (result.published) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Cannot edit published result! Unpublish first." 
-        });
-      }
-
-      // Update fields
-      Object.assign(result, {
-        ...scores,
-        weights: weights || result.weights,
-        enteredBy: teacher._id
-      });
-
-      console.log(`RESULT UPDATED → ${result.studentId} | ${subject} | New Total: ${result.total} (${result.grade})`.yellow.bold);
-
+  if (studentId) {
+    if (req.user.role === 'parent') {
+      const child = await User.findOne({ _id: studentId, parent: req.user._id });
+      if (!child) return res.status(403).json({ success: false, message: 'Not your child' });
+      targetId = studentId;
     } else {
-      // CREATE NEW RESULT
-      const student = await User.findById(studentId);
-      if (!student || student.role !== 'student') {
-        return res.status(404).json({ success: false, message: "Student not found" });
-      }
-
-      result = new Result({
-        student: studentId,
-        studentId: student.studentId,
-        class: student.currentClass,
-        subject,
-        term,
-        session,
-        enteredBy: teacher._id,
-        ...scores,
-        weights
-      });
+      return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
-
-    await result.save();
-
-    res.json({
-      success: true,
-      message: resultId ? "Result updated successfully!" : "Result saved successfully!",
-      result: {
-        _id: result._id,
-        total: result.total,
-        grade: result.grade,
-        published: result.published
-      }
-    });
-
-  } catch (error) {
-    console.error("Save Result Error:".red, error.message);
-    res.status(500).json({ success: false, message: error.message });
+  } else if (req.user.role !== 'student') {
+    return res.status(403).json({ success: false, message: 'Only students can view their marks' });
   }
-};
 
-// TEACHER DELETES RESULT (Only before publishing)
-export const deleteResult = async (req, res) => {
-  const { resultId } = req.params;
-  const teacher = req.user;
+  const marks = await Mark.find({ student: targetId });
+  res.json({ success: true, marks });
+});
 
-  try {
-    const result = await Result.findById(resultId);
-    if (!result) {
-      return res.status(404).json({ success: false, message: "Result not found" });
-    }
+// Get All Marks for Class (admin/superadmin/teacher)
+export const getClassMarks = asyncHandler(async (req, res) => {
+  const { className, subject, term } = req.query;
 
-    // Only owner or admin can delete
-    if (!result.enteredBy.equals(teacher._id) && teacher.role !== 'admin') {
-      return res.status(403).json({ 
-        success: false, 
-        message: "You can only delete your own results!" 
-      });
-    }
-
-    if (result.published) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Cannot delete published result!" 
-      });
-    }
-
-    await Result.findByIdAndDelete(resultId);
-
-    console.log(`RESULT DELETED → ${result.studentId} | ${result.subject} by ${teacher.name}`.red.bold);
-
-    res.json({ success: true, message: "Result deleted successfully!" });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+  if (!['superadmin', 'admin', 'teacher'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
   }
-};
 
-// UNPUBLISH RESULT (So teacher can edit again)
-export const unpublishResult = async (req, res) => {
-  const { resultId } = req.body;
-  const teacher = req.user;
+  const query = { className, term };
+  if (subject) query.subject = subject;
 
-  try {
-    const result = await Result.findById(resultId);
-    if (!result) return res.status(404).json({ success: false, message: "Result not found" });
-
-    if (!result.enteredBy.equals(teacher._id) && teacher.role !== 'admin') {
-      return res.status(403).json({ success: false, message: "Not authorized" });
-    }
-
-    result.published = false;
-    result.publishedAt = null;
-    await result.save();
-
-    console.log(`RESULT UNPUBLISHED → ${result.subject} | ${result.studentId}`.gray.bold);
-
-    res.json({ success: true, message: "Result unpublished. You can now edit." });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+  if (req.user.role === 'teacher') {
+    query.teacher = req.user._id;
   }
-};
+
+  const marks = await Mark.find(query)
+    .populate('student', 'name');
+
+  res.json({ success: true, marks });
+});
+
+// Get Teachers for Subjects (admin/superadmin)
+export const getTeachersForSubjects = asyncHandler(async (req, res) => {
+  if (!['superadmin', 'admin'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const teachers = await User.find({ role: 'teacher', schoolName: req.user.schoolName })
+    .select('name subjects');
+
+  res.json({ success: true, teachers });
+});

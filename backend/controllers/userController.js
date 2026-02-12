@@ -3,9 +3,9 @@ import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
 import Class from '../models/class/classModel.js';
 import Result from '../models/class/resultModel.js';
-import TeacherAttendance from "../models/attendance/teacherAttendance.js"
+import TeacherAttendance from "../models/attendance/DailyQRAttendance.js"
 
-import StudentAttendance from "../models/attendance/studentAttendance.js";
+import StudentAttendance from "../models/attendance/DailyQRAttendance.js";
 import 'colors';
 
 

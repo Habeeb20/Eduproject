@@ -2,142 +2,177 @@
 import Class from '../models/class/classModel.js';
 import User from '../models/User.js';
 
+
+
+
+
 import 'colors';
 
-// CREATE CLASS
-export const createClass = async (req, res) => {
-  const { className, section, classTeacherId } = req.body;
-  const creator = req.user;
 
-  try {
-    const classExists = await Class.findOne({ 
-      className, 
-      section, 
-      schoolName: creator.schoolName 
-    });
 
-    if (classExists) {
-      return res.status(400).json({ 
-        success: false, 
-        message: `${className}-${section} already exists!` 
-      });
+import asyncHandler from 'express-async-handler';
+
+// ──────────────────────────────────────────────
+// Create a new class (superadmin / admin)
+// ──────────────────────────────────────────────
+export const createClass = asyncHandler(async (req, res) => {
+  if (!['superadmin', 'admin'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const { name, level } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ success: false, message: 'Class name is required' });
+  }
+
+  const existing = await Class.findOne({ name, schoolName: req.user.schoolName });
+  if (existing) {
+    return res.status(400).json({ success: false, message: 'Class already exists' });
+  }
+
+  const newClass = await Class.create({
+    name,
+    level: level || null,
+    schoolName: req.user.schoolName,
+    createdBy: req.user._id,
+  });
+
+  res.status(201).json({
+    success: true,
+    message: 'Class created successfully',
+    class: newClass
+  });
+});
+
+// ──────────────────────────────────────────────
+// Get all classes in the school
+// ──────────────────────────────────────────────
+export const getAllClasses = asyncHandler(async (req, res) => {
+  if (!['superadmin', 'admin', 'teacher'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const classes = await Class.find({ schoolName: req.user.schoolName })
+    .populate('students', 'name email')
+    .populate('subjects.teacher', 'name email');
+
+  res.json({ success: true, classes });
+});
+
+// ──────────────────────────────────────────────
+// Add subject to class (and optionally assign teacher)
+// ──────────────────────────────────────────────
+export const addSubjectToClass = asyncHandler(async (req, res) => {
+  if (!['superadmin', 'admin'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const { classId, subjectName, teacherId } = req.body;
+
+  const classDoc = await Class.findById(classId);
+  if (!classDoc || classDoc.schoolName !== req.user.schoolName) {
+    return res.status(404).json({ success: false, message: 'Class not found' });
+  }
+
+  // Check if subject already exists
+  if (classDoc.subjects.some(s => s.subjectName === subjectName)) {
+    return res.status(400).json({ success: false, message: 'Subject already added to this class' });
+  }
+
+  let teacher = null;
+  if (teacherId) {
+    teacher = await User.findById(teacherId);
+    if (!teacher || teacher.role !== 'teacher' || teacher.schoolName !== req.user.schoolName) {
+      return res.status(400).json({ success: false, message: 'Invalid teacher' });
     }
+  }
 
-    const newClass = await Class.create({
-      className,
-      section,
-      classTeacher: classTeacherId || null,
-      createdBy: creator._id,
-      schoolName: creator.schoolName
+  classDoc.subjects.push({
+    subjectName,
+    teacher: teacher ? teacher._id : null
+  });
+
+  await classDoc.save();
+
+  res.json({
+    success: true,
+    message: 'Subject added to class',
+    class: classDoc
+  });
+});
+
+// ──────────────────────────────────────────────
+// Assign teacher to a subject in a class
+// ──────────────────────────────────────────────
+export const assignTeacherToSubject = asyncHandler(async (req, res) => {
+  if (!['superadmin', 'admin'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const { classId, subjectName, teacherId } = req.body;
+
+  const classDoc = await Class.findById(classId);
+  if (!classDoc || classDoc.schoolName !== req.user.schoolName) {
+    return res.status(404).json({ success: false, message: 'Class not found' });
+  }
+
+  const subjectIndex = classDoc.subjects.findIndex(s => s.subjectName === subjectName);
+  if (subjectIndex === -1) {
+    return res.status(404).json({ success: false, message: 'Subject not found in this class' });
+  }
+
+  const teacher = await User.findById(teacherId);
+  if (!teacher || teacher.role !== 'teacher' || teacher.schoolName !== req.user.schoolName) {
+    return res.status(400).json({ success: false, message: 'Invalid teacher' });
+  }
+
+  classDoc.subjects[subjectIndex].teacher = teacher._id;
+  await classDoc.save();
+
+  res.json({
+    success: true,
+    message: 'Teacher assigned to subject',
+    class: classDoc
+  });
+});
+
+
+
+// Get all students in a specific class
+export const getStudentsInClass = asyncHandler(async (req, res) => {
+  const { className } = req.params;
+
+  if (!className) {
+    return res.status(400).json({ success: false, message: 'Class name is required' });
+  }
+
+  // Only superadmin, admin, or teachers should access this
+  if (!['superadmin', 'admin', 'teacher'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  // Find the class
+  const classDoc = await Class.findOne({
+    name: className,
+    schoolName: req.user.schoolName,
+  }).populate('students', 'name email role studentId rollNumber class profilePicture');
+
+  console.log( classDoc)
+  if (!classDoc) {
+    return res.status(404).json({
+      success: false,
+      message: `Class '${className}' not found in your school`,
     });
-
-    console.log(`CLASS CREATED → ${newClass.className}-${newClass.section} | Code: ${newClass.classCode}`.bgGreen.white.bold);
-
-    res.status(201).json({
-      success: true,
-      message: "Class created successfully!",
-      class: newClass
-    });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
   }
-};
 
-// ADD STUDENT TO CLASS
-export const addStudentToClass = async (req, res) => {
-  const { classId, studentId } = req.body;
-
-  try {
-    const classRoom = await Class.findById(classId);
-    const student = await User.findById(studentId);
-
-    if (!classRoom || !student || student.role !== 'student') {
-      return res.status(404).json({ success: false, message: "Class or Student not found" });
-    }
-
-    if (classRoom.students.includes(studentId)) {
-      return res.status(400).json({ success: false, message: "Student already in class" });
-    }
-
-    classRoom.students.push(studentId);
-    classRoom.totalStudents = classRoom.students.length;
-    await classRoom.save();
-
-    // Update student's current class
-    student.currentClass = classRoom._id;
-    student.classCode = classRoom.classCode;
-    await student.save();
-
-    console.log(`STUDENT ADDED → ${student.name} to ${classRoom.className}-${classRoom.section}`.cyan.bold);
-
-    res.json({
-      success: true,
-      message: `${student.name} added to ${classRoom.className}-${classRoom.section}`,
-      classCode: classRoom.classCode
-    });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// GET ALL CLASSES (Admin/Teacher)
-export const getAllClasses = async (req, res) => {
-  try {
-    const classes = await Class.find({ schoolName: req.user.schoolName })
-      .populate('classTeacher', 'name')
-      .populate('students', 'name studentId')
-      .sort({ className: 1, section: 1 });
-
-    res.json({ success: true, count: classes.length, classes });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// STUDENT SEES THEIR CLASS
-export const getMyClass = async (req, res) => {
-  try {
-    const student = await User.findById(req.user._id).populate('currentClass');
-    if (!student.currentClass) {
-      return res.json({ success: true, message: "Not assigned to any class yet" });
-    }
-
-    const classInfo = await Class.findById(student.currentClass._id)
-      .populate('classTeacher', 'name')
-      .populate('students', 'name studentId');
-
-    res.json({
-      success: true,
-      myClass: {
-        name: `${classInfo.className}-${classInfo.section}`,
-        code: classInfo.classCode,
-        totalStudents: classInfo.totalStudents,
-        classTeacher: classInfo.classTeacher?.name || "Not assigned"
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// PARENT SEES CHILD'S CLASS
-export const getChildClass = async (req, res) => {
-  try {
-    const children = await User.find({ parent: req.user._id, role: 'student' })
-      .populate('currentClass');
-
-    const result = children.map(child => ({
-      name: child.name,
-      studentId: child.studentId,
-      class: child.currentClass 
-        ? `${child.currentClass.className}-${child.currentClass.section} (${child.currentClass.classCode})`
-        : "Not assigned yet"
-    }));
-
-    res.json({ success: true, childrenClasses: result });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+  res.json({
+    success: true,
+    class: {
+      name: classDoc.name,
+      level: classDoc.level,
+      studentCount: classDoc.students.length,
+    },
+    students: classDoc.students || [],
+  });
+});

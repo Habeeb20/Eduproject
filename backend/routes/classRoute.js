@@ -1,24 +1,23 @@
-// routes/classRoutes.js
-import express from 'express';
-import { addStudentToClass, createClass, getAllClasses, getChildClass, getMyClass } from '../controllers/classController.js';
-import { protect, authorize } from '../middleware/auth.js';
 
+
+import express from 'express';
+import { protect, authorize } from '../middleware/auth.js';
+import {
+  createClass,
+  getAllClasses,
+  addSubjectToClass,
+  assignTeacherToSubject,
+  getStudentsInClass,
+} from '../controllers/classController.js';
 
 const router = express.Router();
 
-// Admin/Teacher creates class
-router.post('/create', protect, authorize('admin', 'teacher'), createClass);
+router.post('/', protect, authorize('superadmin', 'admin'), createClass);
+router.get('/', protect, authorize('superadmin', 'admin', 'teacher'), getAllClasses);
+router.post('/subjects', protect, authorize('superadmin', 'admin'), addSubjectToClass);
+router.post('/assign-teacher', protect, authorize('superadmin', 'admin'), assignTeacherToSubject);
+// ... existing imports and router setup ...
 
-// Add student to class
-router.post('/add-student', protect, authorize('admin', 'teacher'), addStudentToClass);
-
-// Get all classes
-router.get('/all', protect, authorize('admin', 'teacher', 'superadmin'), getAllClasses);
-
-// Student sees their class
-router.get('/my-class', protect, authorize('student'), getMyClass);
-
-// Parent sees child's class
-router.get('/child-class', protect, authorize('parent'), getChildClass);
-
+// Get students in a specific class
+router.get('/:className/students', protect, getStudentsInClass);
 export default router;

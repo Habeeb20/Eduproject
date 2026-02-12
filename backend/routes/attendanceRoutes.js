@@ -1,41 +1,20 @@
-// routes/teacherAttendanceRoutes.js
-import express from "express";
-import {
-  generateTodayTeacherQR,
-  checkInTeacher,
-  getTodayTeacherAttendance,
-  getTeachersForScan,
-} from "../controllers/teacherAttendanceController.js";
+import express from 'express';
+import { protect, authorize } from '../middleware/auth.js';
+import { setSchoolSettings,  markAttendance,
+  getAttendanceHistory,
+  getAllAttendance,
+  getSchoolSettings, } from '../controllers/attendanceController.js';
 
-import { protect, authorize } from "../middleware/auth.js";
-import { checkInStudent } from "../controllers/studentControllers.js";
 
 const router = express.Router();
 
-router.get(
-  "/generate-qr",
-  protect,
-  authorize("admin", "superadmin"),
-  generateTodayTeacherQR
-);
+router.post('/settings', protect, authorize('superadmin', 'admin'), setSchoolSettings);
+router.get('/settings', protect, authorize('superadmin', 'admin'), getSchoolSettings);
+router.post('/mark', protect, markAttendance);
 
-router.post("/checkin", protect, authorize("teacher"), checkInTeacher);
+router.get('/history', protect, getAttendanceHistory);
+router.get('/history/:userId', protect, getAttendanceHistory); // for parent/admin/superadmin
 
-router.get(
-  "/today",
-  protect,
-  authorize("admin", "superadmin"),
-  getTodayTeacherAttendance
-);
+router.get('/all', protect, authorize(['superadmin', 'admin']), getAllAttendance);
 
-router.get("/teachers-list", protect, authorize("teacher"), getTeachersForScan);
-
-router.get(
-  "/date/:date",
-  protect,
-  authorize("admin", "superadmin"),
-  getTodayTeacherAttendance
-);
-
-router.post("/checkin", protect, authorize("teacher", "admin"), checkInStudent);
 export default router;

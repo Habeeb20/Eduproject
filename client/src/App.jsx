@@ -19,6 +19,10 @@ import SubscriptionPage from './pages/dashboard/superAdmin/SubscribtionPage';
 import VerifyId from './pages/dashboard/VerifyId';
 import AllDigitalIds from './pages/dashboard/superAdmin/AllDigitalCards';
 import MyDigitalId from './pages/dashboard/MyDigitalId';
+import MarkAttendance from './pages/dashboard/adminDashboard/MarkAttendance';
+import AddMarks from './pages/dashboard/teacherDashboard/AddMark';
+import ClassMarks from './pages/dashboard/adminDashboard/ClassMark';
+import CreateClass from './pages/dashboard/Create/CreateClass';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -70,7 +74,11 @@ function App() {
           <Route path="create-teacher" element={<CreateTeacherForm />} />
           <Route path="create-admin" element={<CreateAdminForm />} />
           <Route path="create-staff" element={<CreateStaffForm />} />
+          <Route path="create-class" element={<CreateClass />} />
+          <Route path="add-score" element={<AddMarks />} />
+          <Route path="check-score" element={<ClassMarks />} />
           <Route path="statistics" element={<SuperadminUsersStats />} />
+          <Route path="attendance" element={<MarkAttendance />} />
           <Route path="all-users" element={<SuperadminDashboardOverview />} />
 
           {/* Other sections (use placeholders for now) */}
