@@ -21,8 +21,14 @@ import AllDigitalIds from './pages/dashboard/superAdmin/AllDigitalCards';
 import MyDigitalId from './pages/dashboard/MyDigitalId';
 import MarkAttendance from './pages/dashboard/adminDashboard/MarkAttendance';
 import AddMarks from './pages/dashboard/teacherDashboard/AddMark';
-import ClassMarks from './pages/dashboard/adminDashboard/ClassMark';
+
 import CreateClass from './pages/dashboard/Create/CreateClass';
+import StudentMarksDashboard from './pages/dashboard/studentDashboard/StudentMarks';
+
+import CreateAnnouncement from './pages/dashboard/adminDashboard/CreateAnnoucement';
+import AnnouncementsManagement from './pages/dashboard/adminDashboard/AnnouncementMangement';
+import AnnouncementsFeed from './pages/dashboard/studentDashboard/AnnoucementList';
+import AdminStudentScores from './pages/dashboard/adminDashboard/AdminStudentScores';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -76,10 +82,12 @@ function App() {
           <Route path="create-staff" element={<CreateStaffForm />} />
           <Route path="create-class" element={<CreateClass />} />
           <Route path="add-score" element={<AddMarks />} />
-          <Route path="check-score" element={<ClassMarks />} />
+          <Route path="check-score" element={<AdminStudentScores />} />
           <Route path="statistics" element={<SuperadminUsersStats />} />
           <Route path="attendance" element={<MarkAttendance />} />
           <Route path="all-users" element={<SuperadminDashboardOverview />} />
+          {/* <Route path="create-updates" element={<CreateAnnouncement />} /> */}
+          <Route path="create-updates" element={<AnnouncementsManagement />} />
 
           {/* Other sections (use placeholders for now) */}
           <Route path="students" element={<Placeholder title="All Students" />} />
@@ -97,6 +105,10 @@ function App() {
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="teacher" element={<TeacherDashboard />} />
           <Route path="student" element={<StudenDashboard />} />
+
+            {/* Student routes */}
+               <Route path="grades" element={<StudentMarksDashboard />} />
+               <Route path="updates" element={<AnnouncementsFeed />} />
         </Route>
 
         {/* Catch-all 404 */}

@@ -7,6 +7,8 @@ import {
   CardSim,
   MarsStroke,
   CircleSlash,
+  User,
+  Newspaper,
 } from 'lucide-react';
 
 export default function DashboardLayout() {
@@ -71,6 +73,8 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen, restricted: true },
         { path: '/dashboard/classes', label: 'Classes', icon: Calendar, restricted: true },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar, restricted: true },
+           { path: '/dashboard/create-updates', label: 'Post annoucements', icon: Newspaper, restricted: true },
+          //  { path: '/dashboard/edit-updates', label: 'Edit annoucements', icon: Newspaper, restricted: true },
         { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
         { path: '/dashboard/digital-ids', label: 'Digital IDs', icon: CardSim, restricted: true },
       ];
@@ -85,6 +89,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar, restricted: true },
           { path: '/dashboard/check-score', label: 'Check Score', icon: MarsStroke, restricted: true },
         { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
+        { path: '/dashboard/create-updates', label: 'Post annoucements', icon: Newspaper, restricted: true },
         { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen, restricted: true },
         { path: '/dashboard/create-student', label: 'Add Student', icon: Users, restricted: true },
         { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase, restricted: true },
@@ -101,6 +106,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/my-classes', label: 'My Classes', icon: BookOpen },
         { path: '/dashboard/add-score', label: 'Add scores', icon: BookOpen },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
+           { path: '/dashboard/updates', label: 'Annoucements', icon: Newspaper },
         { path: '/dashboard/grades', label: 'Grades', icon: FileText },
            { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
         ...baseItems,
@@ -112,6 +118,8 @@ const getSidebarItems = (role) => {
       items = [
         { path: '/dashboard', label: 'Dashboard', icon: Home },
         { path: '/dashboard/profile', label: 'My Profile', icon: User },
+        { path: '/dashboard/updates', label: 'Annoucements', icon: Newspaper },
+
         { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
            { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },

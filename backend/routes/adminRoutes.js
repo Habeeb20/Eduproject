@@ -56,7 +56,8 @@ import { createSchoolAdmin,   createTeacher,
   login,
   getAllUsersInSchool,
   updateUser,
-  deleteUser, } from '../controllers/adminControllers.js';
+  deleteUser,
+  getAllStudents, } from '../controllers/adminControllers.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 const adminRouter = express.Router();
@@ -111,6 +112,7 @@ adminRouter.get('/superadmin-stats', protect, authorize('superadmin'), getSupera
 adminRouter.get('/users/school', protect, authorize('superadmin'), getAllUsersInSchool);
 adminRouter.put('/users/:id', protect, authorize(['admin', 'superadmin']), updateUser);
 adminRouter.delete('/users/:id', protect, authorize(['admin', 'superadmin']), deleteUser);
-
+adminRouter.get('/students', protect, authorize('superadmin', 'admin'), getAllStudents);
 adminRouter.post("/login", login)
+
 export default adminRouter;

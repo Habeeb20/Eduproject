@@ -570,7 +570,22 @@ export const login = asyncHandler(async (req, res) => {
 
 
 
+export const getAllStudents = asyncHandler(async (req, res) => {
+  if (!['superadmin', 'admin'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
 
+  const students = await User.find({
+    role: 'student',
+    schoolName: req.user.schoolName,
+  }).select('name class rollNumber studentId profilePicture');
+
+  res.json({
+    success: true,
+    count: students.length,
+    students,
+  });
+});
 
 
 

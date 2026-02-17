@@ -46,52 +46,88 @@ export const assignSubjectsToTeacher = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Subjects assigned' });
 });
 
-// Add/Update Marks (teacher)
+// controllers/markController.js
 export const addMarks = asyncHandler(async (req, res) => {
   if (req.user.role !== 'teacher') {
     return res.status(403).json({ success: false, message: 'Only teachers can add marks' });
   }
 
-  const { studentId, subject, term, marks, autoPosition } = req.body;
+  const { className, subject, term, marks, autoPosition } = req.body;
 
-  // Check settings
-  const settings = await SchoolSettings.findOne({ schoolName: req.user.schoolName });
-  if (!settings.allowTeacherMarkAny && !req.user.subjects.includes(subject)) {
-    return res.status(403).json({ success: false, message: 'Not authorized for this subject' });
+  // Validate required fields
+  if (!className || !subject || !term || !marks || typeof marks !== 'object') {
+    return res.status(400).json({ success: false, message: 'Invalid payload: class, subject, term, and marks object required' });
   }
 
-  let mark = await Mark.findOne({ student: studentId, subject, term });
-
-  if (!mark) {
-    mark = new Mark({
-      student: studentId,
-      subject,
-      className: (await User.findById(studentId)).class, // assume student has class field
-      term,
-      teacher: req.user._id,
-      schoolName: req.user.schoolName,
+  // Check settings for autoPosition
+  const settings = await SchoolSettings.findOne({ schoolName: req.user.schoolName });
+  if (autoPosition && !settings?.allowTeacherMarkAny) {
+    return res.status(403).json({
+      success: false,
+      message: 'Automatic position calculation is disabled by Admin',
     });
   }
 
-  mark.marks.firstTest = marks.firstTest;
-  mark.marks.secondTest = marks.secondTest;
-  mark.marks.thirdTest = marks.thirdTest;
-  mark.marks.midTerm = marks.midTerm;
-  mark.marks.examination = marks.examination;
-  mark.marks.total = 
-    marks.firstTest + marks.secondTest + marks.thirdTest + marks.midTerm + marks.examination;
-  mark.autoPosition = autoPosition;
+  const updatedMarks = [];
 
-  await mark.save();
+  // Loop through each student in the marks object
+  for (const [studentId, studentMarks] of Object.entries(marks)) {
+    // Validate student exists
+    const student = await User.findById(studentId);
+    if (!student) {
+      console.warn(`Student ${studentId} not found`);
+      continue; // Skip invalid student
+    }
 
-  // If autoPosition true, calculate rank
-  if (autoPosition) {
-    await calculatePositions(mark.className, subject, term);
+    // Validate student belongs to the class
+    if (student.class !== className || student.schoolName !== req.user.schoolName) {
+      console.warn(`Student ${studentId} not in class ${className}`);
+      continue;
+    }
+
+    let mark = await Mark.findOne({ student: studentId, subject, term });
+
+    if (!mark) {
+      mark = new Mark({
+        student: studentId,
+        subject,
+        className,
+        term,
+        teacher: req.user._id,
+        schoolName: req.user.schoolName,
+      });
+    }
+
+    // Update marks
+    mark.marks.firstTest = studentMarks.firstTest || 0;
+    mark.marks.secondTest = studentMarks.secondTest || 0;
+    mark.marks.thirdTest = studentMarks.thirdTest || 0;
+    mark.marks.midTerm = studentMarks.midTerm || 0;
+    mark.marks.examination = studentMarks.examination || 0;
+    mark.marks.total =
+      mark.marks.firstTest +
+      mark.marks.secondTest +
+      mark.marks.thirdTest +
+      mark.marks.midTerm +
+      mark.marks.examination;
+
+    mark.autoPosition = autoPosition || false;
+
+    await mark.save();
+    updatedMarks.push(mark);
   }
 
-  res.json({ success: true, message: 'Marks updated', mark });
-});
+  // If autoPosition enabled, recalculate ranks for the whole class/subject/term
+  if (autoPosition) {
+    await calculatePositions(className, subject, term);
+  }
 
+  res.json({
+    success: true,
+    message: `Marks updated for ${updatedMarks.length} students`,
+    updatedCount: updatedMarks.length,
+  });
+});
 // Calculate Positions for Class/Subject/Term
 async function calculatePositions(className, subject, term) {
   const marks = await Mark.find({ className, subject, term }).sort({ 'marks.total': -1 });
@@ -122,9 +158,9 @@ export const getStudentMarks = asyncHandler(async (req, res) => {
   let targetId = req.user._id;
 
   if (studentId) {
-    if (req.user.role === 'parent') {
+    if (req.user.role === 'parent' || req.user.role === 'teacher' || req.user.role === 'superadmin') {
       const child = await User.findOne({ _id: studentId, parent: req.user._id });
-      if (!child) return res.status(403).json({ success: false, message: 'Not your child' });
+      // if (!child) return res.status(403).json({ success: false, message: 'Not your child' });
       targetId = studentId;
     } else {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
@@ -134,6 +170,7 @@ export const getStudentMarks = asyncHandler(async (req, res) => {
   }
 
   const marks = await Mark.find({ student: targetId });
+  console.log(marks)
   res.json({ success: true, marks });
 });
 
@@ -141,21 +178,63 @@ export const getStudentMarks = asyncHandler(async (req, res) => {
 export const getClassMarks = asyncHandler(async (req, res) => {
   const { className, subject, term } = req.query;
 
+  // Debug logs (remove in production)
+  console.log('Query params received:', { className, subject, term });
+  console.log('User role:', req.user.role);
+  console.log('User schoolName:', req.user.schoolName);
+  console.log('User ID:', req.user._id?.toString());
+
   if (!['superadmin', 'admin', 'teacher'].includes(req.user.role)) {
     return res.status(403).json({ success: false, message: 'Unauthorized' });
   }
 
-  const query = { className, term };
-  if (subject) query.subject = subject;
-
-  if (req.user.role === 'teacher') {
-    query.teacher = req.user._id;
+  // Required parameters
+  if (!className?.trim() || !term?.trim()) {
+    console.log('error')
+    return res.status(400).json({ 
+      success: false, 
+      message: 'className and term are required query parameters' 
+    });
   }
 
-  const marks = await Mark.find(query)
-    .populate('student', 'name');
+  // Build query with schoolName ALWAYS included
+  const query = {
+    className: className.trim(),
+    term: term.trim(),
+    schoolName: req.user.schoolName,  // ← This restricts results to the current user's school
+  };
 
-  res.json({ success: true, marks });
+  // Optional subject filter
+  if (subject?.trim()) {
+    query.subject = subject.trim();
+  }
+
+  // For teachers: only see marks they personally entered
+  if (req.user.role === 'teacher') {
+    query.teacher = req.user._id;
+    console.log('Teacher restriction applied → filtering by teacher ID:', req.user._id.toString());
+  }
+
+  console.log('Final MongoDB query:', query);
+
+  const marks = await Mark.find(query)
+    .populate('student', 'name studentId rollNumber class profilePicture') // more fields for frontend
+    .sort({ 'marks.total': -1 }) // highest score first
+    .lean();
+
+  console.log('Found marks count:', marks.length);
+  if (marks.length > 0) {
+    console.log('First mark sample:', marks[0]);
+  } else {
+    console.log('No marks found matching this exact query');
+  }
+
+  res.json({
+    success: true,
+    queryUsed: query,
+    count: marks.length,
+    marks,
+  });
 });
 
 // Get Teachers for Subjects (admin/superadmin)

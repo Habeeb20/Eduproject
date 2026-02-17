@@ -12,6 +12,7 @@ import classRouter from "./routes/classRoute.js";
 import paymentrouter from "./routes/paymentRoute.js"
 import attendanceRouter from "./routes/attendanceRoutes.js"
 import markRoutes from "./routes/resultRoutes.js"
+import announcementRoutes from "./routes/annoucementRoutes.js"
 dotenv.config();
 
 connectDb()
@@ -50,7 +51,7 @@ app.use("/api/classes", classRouter)
 app.use("/api/attendance", attendanceRouter)
 app.use('/api/marks', markRoutes);
 app.use("/api/payment", paymentrouter)
-
+app.use('/api/announcements', announcementRoutes);
 
 // Start server
 const port = process.env.PORT || 2000;

@@ -40,8 +40,7 @@ export const protect = async (req, res, next) => {
 export const authorize = (...roles) => {
 
   return (req, res, next) => {
-      console.log(req.user)
-      console.log(roles)
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
@@ -53,6 +52,13 @@ export const authorize = (...roles) => {
 };
 
 
+
+export const schoolOnly = (req, res, next) => {
+  if (!req.user.schoolId) {
+    return res.status(403).json({ message: "Access denied: school required" });
+  }
+  next();
+};
 
 
 
