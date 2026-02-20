@@ -160,14 +160,12 @@ export const getStudentMarks = asyncHandler(async (req, res) => {
   if (studentId) {
     if (req.user.role === 'parent' || req.user.role === 'teacher' || req.user.role === 'superadmin') {
       const child = await User.findOne({ _id: studentId, parent: req.user._id });
-      // if (!child) return res.status(403).json({ success: false, message: 'Not your child' });
+      if (!child) return res.status(400).json({ success: false, message: 'Not your child' });
       targetId = studentId;
     } else {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
-  } else if (req.user.role !== 'student') {
-    return res.status(403).json({ success: false, message: 'Only students can view their marks' });
-  }
+  } 
 
   const marks = await Mark.find({ student: targetId });
   console.log(marks)

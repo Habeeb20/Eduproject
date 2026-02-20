@@ -16,7 +16,8 @@ import asyncHandler from 'express-async-handler';
 // Create a new class (superadmin / admin)
 // ──────────────────────────────────────────────
 export const createClass = asyncHandler(async (req, res) => {
-  if (!['superadmin', 'admin'].includes(req.user.role)) {
+  try {
+     if (!['superadmin', 'admin'].includes(req.user.role)) {
     return res.status(403).json({ success: false, message: 'Unauthorized' });
   }
 
@@ -43,8 +44,13 @@ export const createClass = asyncHandler(async (req, res) => {
     message: 'Class created successfully',
     class: newClass
   });
-});
 
+
+  } catch (error) {
+    console.error('Error creating class:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+ });
 // ──────────────────────────────────────────────
 // Get all classes in the school
 // ──────────────────────────────────────────────

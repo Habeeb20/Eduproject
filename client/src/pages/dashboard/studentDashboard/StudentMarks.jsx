@@ -1,6 +1,7 @@
 // src/pages/dashboard/StudentMarksDashboard.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { AlertCircle } from 'lucide-react';
 import { Pie, Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -54,6 +55,7 @@ export default function StudentMarksDashboard() {
       setSubjects(uniqueSubjects);
       setTerms(uniqueTerms);
     } catch (err) {
+      console.log(err)
       setError(err.response?.data?.message || 'Failed to load marks');
       toast.error('Failed to load your marks');
     } finally {

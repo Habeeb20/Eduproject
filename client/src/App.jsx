@@ -29,6 +29,12 @@ import CreateAnnouncement from './pages/dashboard/adminDashboard/CreateAnnouceme
 import AnnouncementsManagement from './pages/dashboard/adminDashboard/AnnouncementMangement';
 import AnnouncementsFeed from './pages/dashboard/studentDashboard/AnnoucementList';
 import AdminStudentScores from './pages/dashboard/adminDashboard/AdminStudentScores';
+import UploadLessonNote from './pages/dashboard/teacherDashboard/TeacherUploadLessonNote';
+import LessonNoteReview from './pages/dashboard/adminDashboard/LessonNoteReview';
+import CreateTest from './pages/dashboard/teacherDashboard/CreateTest';
+import TeacherAnalytics from './pages/dashboard/teacherDashboard/TeacherAnalytic';
+import AdminExamAnalytics from './pages/dashboard/adminDashboard/AdminAnalyticForTest';
+import TestCBT from './pages/dashboard/studentDashboard/TestCBT';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -97,9 +103,12 @@ function App() {
           <Route path="fees" element={<Placeholder title="Fees & Payments" />} />
           <Route path="reports" element={<Placeholder title="Reports & Analytics" />} />
           <Route path="settings" element={<Placeholder title="Settings & Profile" />} />
+           <Route path="lesson-notes" element={<LessonNoteReview />} />
+           <Route path="text-admin-analytics" element={<AdminExamAnalytics />} />
 
 <Route path="/dashboard/digital-ids" element={<AllDigitalIds />} />         {/* Superadmin/Admin */}
 <Route path="/dashboard/my-id" element={<MyDigitalId />} />               {/* All users */}
+
           {/* Role-specific dashboards (you can replace placeholders later) */}
           <Route path="superadmin" element={<SuperadminDashboardOverview />} />
           <Route path="admin" element={<AdminDashboard />} />
@@ -109,6 +118,13 @@ function App() {
             {/* Student routes */}
                <Route path="grades" element={<StudentMarksDashboard />} />
                <Route path="updates" element={<AnnouncementsFeed />} />
+               <Route path="testCBT" element={<TestCBT />} />
+
+            {/* Teacher routes */}
+               <Route path="upload-lesson-note" element={<UploadLessonNote />} />
+               <Route path="create-test" element={<CreateTest />} />
+               <Route path="test-analytics" element={<TeacherAnalytics />} />
+              
         </Route>
 
         {/* Catch-all 404 */}
