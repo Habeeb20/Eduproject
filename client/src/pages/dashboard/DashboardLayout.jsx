@@ -10,6 +10,7 @@ import {
   User,
   Newspaper,
   BarChart,
+  MessageCircle,
 } from 'lucide-react';
 
 export default function DashboardLayout() {
@@ -71,6 +72,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck, restricted: true },
         { path: '/dashboard/students', label: 'Students', icon: Users, restricted: true },
            { path: '/dashboard/lesson-notes', label: 'Lesson Notes', icon: FileText },
+            { path: '/dashboard/messages', label: 'Get Message', icon: MessageCircle },
         { path: '/dashboard/check-score', label: 'Check Score', icon: MarsStroke, restricted: true },
         { path: '/dashboard/teachers', label: 'Teachers', icon: BookOpen, restricted: true },
         { path: '/dashboard/classes', label: 'Classes', icon: Calendar, restricted: true },
@@ -92,6 +94,7 @@ const getSidebarItems = (role) => {
           { path: '/dashboard/check-score', label: 'Check Score', icon: MarsStroke, restricted: true },
         { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
            { path: '/dashboard/lesson-notes', label: 'Lesson Notes', icon: FileText },
+              { path: '/dashboard/messages', label: 'Get Message', icon: MessageCircle },
                       { path: '/dashboard/text-admin-analytics', label: 'CBT Analytics', icon: Newspaper, restricted: true },
         { path: '/dashboard/create-updates', label: 'Post annoucements', icon: Newspaper, restricted: true },
         { path: '/dashboard/create-teacher', label: 'Create Teacher', icon: BookOpen, restricted: true },
@@ -112,8 +115,10 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
         { path: '/dashboard/create-test', label: 'Create CBTest', icon: FileText },
         { path: '/dashboard/test-analytics', label: 'Test Analytics', icon: BarChart },
+        { path: '/dashboard/create-group', label: 'Create Group', icon: Users },
+        { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
         { path: '/dashboard/upload-lesson-note', label: 'Upload Lesson Note', icon: FileText },
-        
+           { path: '/dashboard/messages', label: 'Get Messages', icon: MessageCircle },
         { path: '/dashboard/grades', label: 'Grades', icon: FileText },
            { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
         ...baseItems,
@@ -121,10 +126,25 @@ const getSidebarItems = (role) => {
       break;
 
     case 'student':
-    case 'parent':
+
       items = [
         { path: '/dashboard', label: 'Dashboard', icon: Home },
         { path: '/dashboard/profile', label: 'My Profile', icon: User },
+        { path: '/dashboard/updates', label: 'Annoucements', icon: Newspaper },
+        { path: '/dashboard/testCBT', label: 'Test CBT', icon: Newspaper },
+        { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
+
+        { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
+        { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
+           { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
+        ...baseItems,
+      ];
+      break;
+
+      case 'parent':
+      items = [
+        { path: '/dashboard', label: 'Dashboard', icon: Home },
+        { path: '/dashboard/messages', label: 'Send Message', icon: MessageCircle },
         { path: '/dashboard/updates', label: 'Annoucements', icon: Newspaper },
         { path: '/dashboard/testCBT', label: 'Test CBT', icon: Newspaper },
 
@@ -134,6 +154,7 @@ const getSidebarItems = (role) => {
         ...baseItems,
       ];
       break;
+
 
     default:
       items = baseItems;

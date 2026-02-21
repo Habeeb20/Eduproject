@@ -6,6 +6,7 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import { generateDigitalId } from '../utils/generateDigitalId.js';
 import Class from '../models/class/classModel.js';
+import { autoAddToSchoolGroup } from './groupController.js';
 // ──────────────────────────────────────────────
 // 1. Superadmin creates school admin
 // ──────────────────────────────────────────────
@@ -88,6 +89,9 @@ export const createTeacher = asyncHandler(async (req, res) => {
   });
   const digitalId = await generateDigitalId(teacher);
 
+  if (teacher.role === 'parent' || teacher.role === 'teacher') {
+  await autoAddToSchoolGroup(teacher);
+}
   res.status(201).json({
     success: true,
     message: 'Teacher created',

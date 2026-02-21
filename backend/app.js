@@ -15,6 +15,8 @@ import markRoutes from "./routes/resultRoutes.js"
 import announcementRoutes from "./routes/annoucementRoutes.js"
 import lessonNoteRoutes from "./routes/lessonRoute.js"
 import testRouter from "./routes/testRoutes.js";
+import messageRoutes from "./routes/messageRoute.js"
+import groupRoutes from "./routes/groupRoute.js";
 dotenv.config();
 
 connectDb()
@@ -56,6 +58,8 @@ app.use("/api/payment", paymentrouter)
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/lesson-notes', lessonNoteRoutes);
 app.use("/api/tests", testRouter) // test routes are in testRoutes.js now
+app.use('/api/messages', messageRoutes);
+app.use('/api/groups', groupRoutes);
 // Start server
 const port = process.env.PORT || 2000;
 

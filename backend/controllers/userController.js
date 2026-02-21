@@ -196,6 +196,7 @@ export const getAllStudents = async (req, res) => {
 
     res.json({ success: true, count: students.length, students });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -413,5 +414,22 @@ export const getCurrentUser = async (req, res) => {
       subscriptionEnd: user.subscriptionEnd,
       subscriptionStatus: user.subscriptionStatus,
     }
+  });
+};
+
+
+
+
+export const getAllStudents1 = async (req, res) => {
+
+  const students = await User.find({
+    role: 'student',
+    schoolName: req.user.schoolName,
+  }).select('name class rollNumber studentId profilePicture');
+
+  res.json({
+    success: true,
+    count: students.length,
+    students,
   });
 };

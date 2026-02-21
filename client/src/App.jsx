@@ -36,6 +36,10 @@ import TeacherAnalytics from './pages/dashboard/teacherDashboard/TeacherAnalytic
 import AdminExamAnalytics from './pages/dashboard/adminDashboard/AdminAnalyticForTest';
 import TestCBT from './pages/dashboard/studentDashboard/TestCBT';
 
+import Messages from './pages/dashboard/Parent/Message';
+import CreateGroup from './pages/dashboard/teacherDashboard/CreateGroup';
+import GroupChat from './pages/dashboard/studentDashboard/GroupChat';
+
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
   <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
@@ -119,11 +123,20 @@ function App() {
                <Route path="grades" element={<StudentMarksDashboard />} />
                <Route path="updates" element={<AnnouncementsFeed />} />
                <Route path="testCBT" element={<TestCBT />} />
+               <Route path="group-chat" element={<GroupChat />} />
+
+               
+            {/* Student routes */}
+         <Route path="messages" element={<Messages />} />
+               {/* <Route path="updates" element={<AnnouncementsFeed />} />
+               <Route path="testCBT" element={<TestCBT />} /> */}
 
             {/* Teacher routes */}
                <Route path="upload-lesson-note" element={<UploadLessonNote />} />
                <Route path="create-test" element={<CreateTest />} />
                <Route path="test-analytics" element={<TeacherAnalytics />} />
+               <Route path="messages" element={<Messages />} />
+               <Route path="create-group" element={<CreateGroup />} />
               
         </Route>
 
