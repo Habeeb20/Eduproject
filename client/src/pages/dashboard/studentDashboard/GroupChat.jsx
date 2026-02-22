@@ -56,7 +56,8 @@ export default function GroupChat() {
       setMessages(res.data.messages || []);
       scrollToBottom();
     } catch (err) {
-      toast.error('Failed to load messages');
+        console.log(err)
+      toast.error(err.response?.data?.message || 'Failed to load messages');
     } finally {
       setLoadingMessages(false);
     }
@@ -81,6 +82,7 @@ export default function GroupChat() {
       fetchMessages();
       toast.success('Message sent');
     } catch (err) {
+        console.log(err)
       toast.error(err.response?.data?.message || 'Failed to send message');
     } finally {
       setSending(false);
@@ -95,10 +97,10 @@ export default function GroupChat() {
       {/* Header */}
       <header className="bg-indigo-700 text-white p-4 md:p-6 shadow-lg">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+          <h4 className="text-xl md:text-3xl font-bold flex items-center gap-3">
             <MessageCircle className="h-8 w-8" />
             Group Chat
-          </h1>
+          </h4>
 
           {groups.length > 0 && (
             <div className="w-full md:w-80">

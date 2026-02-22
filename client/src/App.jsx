@@ -39,6 +39,7 @@ import TestCBT from './pages/dashboard/studentDashboard/TestCBT';
 import Messages from './pages/dashboard/Parent/Message';
 import CreateGroup from './pages/dashboard/teacherDashboard/CreateGroup';
 import GroupChat from './pages/dashboard/studentDashboard/GroupChat';
+import SchoolWideGroupAdmin from './pages/dashboard/superAdmin/SchoolGroup';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -98,6 +99,7 @@ function App() {
           <Route path="all-users" element={<SuperadminDashboardOverview />} />
           {/* <Route path="create-updates" element={<CreateAnnouncement />} /> */}
           <Route path="create-updates" element={<AnnouncementsManagement />} />
+          <Route path="school-group" element={<SchoolWideGroupAdmin />} />
 
           {/* Other sections (use placeholders for now) */}
           <Route path="students" element={<Placeholder title="All Students" />} />
@@ -137,6 +139,7 @@ function App() {
                <Route path="test-analytics" element={<TeacherAnalytics />} />
                <Route path="messages" element={<Messages />} />
                <Route path="create-group" element={<CreateGroup />} />
+                  <Route path="school-group" element={<SchoolWideGroupAdmin />} />
               
         </Route>
 

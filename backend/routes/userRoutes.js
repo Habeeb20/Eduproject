@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerSuperAdmin, login, getSchoolOverview, getAllTeachers, getAllStudents, getAllParents, getAllClasses, getAllResults, getSchoolStaff, editUser, deleteUser, getCurrentUser, getAllStudents1 } from '../controllers/userController.js';
+import { registerSuperAdmin, login, getSchoolOverview, getAllTeachers, getAllStudents, getAllParents, getAllClasses, getAllResults, getSchoolStaff, editUser, deleteUser, getCurrentUser, getAllStudents1, getSchoolRecipients } from '../controllers/userController.js';
 import { authorize, protect } from '../middleware/auth.js';
 import User from '../models/User.js';
 
@@ -16,7 +16,7 @@ router.get('/parents', protect, authorize('superadmin'), getAllParents);
 router.get("/classes", protect, authorize('superadmin'), getAllClasses)
 router.get("/results", protect, authorize('superadmin'), getAllResults)
 router.get("/staff", protect, authorize('superadmin'), getSchoolStaff)
-
+router.get('/school-recipients', protect, getSchoolRecipients);
 router.put('/edit-user/:userId', editUser);
 router.delete('/delete-user/:userId', deleteUser);
 

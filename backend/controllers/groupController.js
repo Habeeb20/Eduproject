@@ -137,23 +137,68 @@ export const sendGroupMessage = asyncHandler(async (req, res) => {
 });
 
 // 4. Get group messages
+// export const getGroupMessages = asyncHandler(async (req, res) => {
+//   const { groupId } = req.params;
+
+//   const group = await Group.findById(groupId).populate('participants', 'name role profilePicture') 
+//     .lean();;
+//   if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
+
+//   console.log(group.participants)
+
+//   if (!group.participants.includes(req.user._id) && !group.admins.includes(req.user._id) && group.createdBy.toString() !== req.user._id.toString()) {
+//     return res.status(403).json({ success: false, message: 'You are not a member of this group' });
+//   }
+
+//   const messages = await GroupMessage.find({ group: groupId })
+//     .populate('sender', 'name profilePicture role')
+//     .sort({ createdAt: 1 })
+//     .lean();
+
+//   res.json({ success: true, messages });
+// });
+
 export const getGroupMessages = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
 
-  const group = await Group.findById(groupId).populate('participants', 'name role profilePicture') // ← populate here too if needed
-    .lean();;
-  if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
+  // Fetch group with populated participants
+  const group = await Group.findById(groupId)
+    .populate('participants', 'name role profilePicture')
+    .populate('admins', 'name role profilePicture')
+    .populate('createdBy', 'name role profilePicture')
+    .lean();
 
-  if (!group.participants.includes(req.user._id) && !group.admins.includes(req.user._id) && group.createdBy.toString() !== req.user._id.toString()) {
-    return res.status(403).json({ success: false, message: 'Not a member' });
+  if (!group) {
+    return res.status(404).json({ success: false, message: 'Group not found' });
   }
 
+  // Membership check using populated objects
+  const isMember = group.participants.some(
+    (p) => p._id.toString() === req.user._id.toString()
+  );
+  const isAdmin = group.admins.some(
+    (a) => a._id.toString() === req.user._id.toString()
+  );
+  const isCreator = group.createdBy._id.toString() === req.user._id.toString();
+
+  if (!isMember && !isAdmin && !isCreator) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not a member, admin, or creator of this group',
+    });
+  }
+
+  // Fetch messages
   const messages = await GroupMessage.find({ group: groupId })
     .populate('sender', 'name profilePicture role')
     .sort({ createdAt: 1 })
     .lean();
 
-  res.json({ success: true, messages });
+  res.json({
+    success: true,
+    messages,
+    group, // optional: return group with populated participants
+  });
 });
 
 // 5. Admin/superadmin remove participant
@@ -308,4 +353,80 @@ export const getGroupDetails = asyncHandler(async (req, res) => {
   }
 
   res.json({ success: true, group });
+});
+
+
+
+
+// GET /api/groups/school-wide
+export const getSchoolWideGroup = asyncHandler(async (req, res) => {
+  const group = await Group.findOne({ type: 'school_wide', schoolName: req.user.schoolName })
+    .populate('participants', 'name role profilePicture')
+    .populate('admins', 'name role profilePicture')
+    .lean();
+
+  if (!group) return res.status(404).json({ success: false, message: 'School-wide group not found' });
+
+  res.json({ success: true, group });
+});
+
+
+
+// POST /api/groups/:groupId/add-participants
+export const addParticipants = asyncHandler(async (req, res) => {
+  const { groupId } = req.params;
+  const { userIds } = req.body;
+  const user = req.user;
+
+  const group = await Group.findById(groupId);
+  if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
+
+  if (!['admin', 'superadmin'].includes(user.role)) {
+    return res.status(403).json({ success: false, message: 'Only admins/superadmin can add participants' });
+  }
+
+  const validUsers = await User.find({ _id: { $in: userIds }, schoolName: group.schoolName });
+  const newParticipants = validUsers.map(u => u._id);
+
+  group.participants = [...new Set([...group.participants, ...newParticipants])];
+  await group.save();
+
+  res.json({ success: true, group });
+});
+
+
+
+
+
+
+
+
+export const updateGroupName = asyncHandler(async (req, res) => {
+  const { groupId } = req.params;
+  const { name } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ success: false, message: 'Group name is required' });
+  }
+
+  const group = await Group.findById(groupId);
+  if (!group) {
+    return res.status(404).json({ success: false, message: 'Group not found' });
+  }
+
+  // Optional: restrict to creator or superadmin only
+  if (group.createdBy.toString() !== req.user._id.toString() && req.user.role !== 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Only the creator or superadmin can rename this group' });
+  }
+
+  // For school-wide group, only admin/superadmin (already checked by authorize middleware)
+
+  group.name = name.trim();
+  await group.save();
+
+  res.json({
+    success: true,
+    message: 'Group name updated successfully',
+    group,
+  });
 });

@@ -10,7 +10,7 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['new_message', 'reply', 'system', 'group_join', 'group_message'],
+      enum: ['new_message', 'reply', 'system', 'group_join', 'group_message', 'group_blocked', 'group_unblocked'],
       required: true,
     },
     title: {

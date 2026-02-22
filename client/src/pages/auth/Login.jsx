@@ -32,6 +32,9 @@ export default function LoginPage() {
       }
 
       localStorage.setItem('token', data.token);
+
+      localStorage.setItem('userId', data.user.id);
+
       localStorage.setItem('user', JSON.stringify(data.user || {}));
 // After successful login or fetch user
 localStorage.setItem('subscriptionStatus', data.user.subscriptionStatus);

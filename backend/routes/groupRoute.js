@@ -7,7 +7,10 @@ import { createGroup,  sendGroupMessage,
   toggleBlockGroup,
   createSchoolWideGroup,
   getMyGroups,
-  getGroupDetails, } from '../controllers/groupController.js';
+  getGroupDetails,
+  getSchoolWideGroup,
+  addParticipants,
+  updateGroupName, } from '../controllers/groupController.js';
 
 
 const router = express.Router();
@@ -16,8 +19,12 @@ router.post('/', protect, authorize('teacher'), createGroup);
 router.post('/:groupId/message', protect, sendGroupMessage);
 router.get('/:groupId/messages', protect, getGroupMessages);
 router.delete('/:groupId/participant/:userId', protect, authorize('admin', 'superadmin'), removeParticipant);
-router.post('/:groupId/block', protect, authorize('admin', 'superadmin'), toggleBlockGroup);
+router.put('/:groupId/block', protect, authorize('admin', 'superadmin'), toggleBlockGroup);
 router.post('/school-wide', protect, authorize('admin', 'superadmin'), createSchoolWideGroup);
 router.get('/my', protect, getMyGroups);
 router.get('/:groupId/details', protect, getGroupDetails);
+router.get('/school-wide', protect, getSchoolWideGroup);
+router.post('/:groupId/add-participants', protect, addParticipants)
+// Add this line
+router.put('/:groupId/name', protect, authorize('admin', 'superadmin'), updateGroupName);
 export default router;

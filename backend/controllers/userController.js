@@ -433,3 +433,27 @@ export const getAllStudents1 = async (req, res) => {
     students,
   });
 };
+
+
+
+export const getSchoolRecipients =async (req, res) => {
+  const user = req.user;
+
+  if (!['admin', 'superadmin'].includes(user.role)) {
+    return res.status(403).json({ success: false, message: 'Only admins/superadmins can access this' });
+  }
+
+  const users = await User.find({
+    schoolName: user.schoolName,
+    role: { $in: ['teacher', 'parent'] },
+    _id: { $ne: user._id }, // exclude self
+  })
+    .select('_id name role profilePicture email class') // fields you need in frontend
+    .sort({ name: 1 })
+    .lean();
+
+  res.json({
+    success: true,
+    users, 
+  });
+};
