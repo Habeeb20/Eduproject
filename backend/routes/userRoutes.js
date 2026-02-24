@@ -15,7 +15,7 @@ router.get('/students1', protect,  getAllStudents1);
 router.get('/parents', protect, authorize('superadmin'), getAllParents);
 router.get("/classes", protect, authorize('superadmin'), getAllClasses)
 router.get("/results", protect, authorize('superadmin'), getAllResults)
-router.get("/staff", protect, authorize('superadmin'), getSchoolStaff)
+router.get("/staff", protect, authorize('superadmin', 'accountant'), getSchoolStaff)
 router.get('/school-recipients', protect, getSchoolRecipients);
 router.put('/edit-user/:userId', editUser);
 router.delete('/delete-user/:userId', deleteUser);

@@ -52,7 +52,20 @@ export default {
           600: '#4f46e5',
           700: '#4338ca',
         },
+           animation: {
+        'pulse-slow': 'pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
+      },
+
+      animation: {
+      'slow-rotate': 'slowRotate 40s linear infinite',
+    },
+    keyframes: {
+      slowRotate: {
+        '0%': { transform: 'rotate(0deg)' },
+        '100%': { transform: 'rotate(360deg)' },
+      },
+    },
 
       // Optional: nice gradients you can use
       backgroundImage: {

@@ -17,6 +17,7 @@ import lessonNoteRoutes from "./routes/lessonRoute.js"
 import testRouter from "./routes/testRoutes.js";
 import messageRoutes from "./routes/messageRoute.js"
 import groupRoutes from "./routes/groupRoute.js";
+import payrollRoutes from "./routes/payrollRoute.js"
 dotenv.config();
 
 connectDb()
@@ -60,6 +61,7 @@ app.use('/api/lesson-notes', lessonNoteRoutes);
 app.use("/api/tests", testRouter) // test routes are in testRoutes.js now
 app.use('/api/messages', messageRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/payrolls', payrollRoutes)
 // Start server
 const port = process.env.PORT || 2000;
 

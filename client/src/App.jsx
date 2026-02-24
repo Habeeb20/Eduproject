@@ -40,6 +40,8 @@ import Messages from './pages/dashboard/Parent/Message';
 import CreateGroup from './pages/dashboard/teacherDashboard/CreateGroup';
 import GroupChat from './pages/dashboard/studentDashboard/GroupChat';
 import SchoolWideGroupAdmin from './pages/dashboard/superAdmin/SchoolGroup';
+import Home from './pages/Home';
+import AccountantDashboard from './pages/dashboard/Accountant/AccountantDashboard';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -75,6 +77,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 <Route path="/verify" element={<VerifyId />} />
+<Route path="/" element={<Home />} />
 
            <Route path="/login/user" element={<LoginPageForUser />} />
 
@@ -140,6 +143,9 @@ function App() {
                <Route path="messages" element={<Messages />} />
                <Route path="create-group" element={<CreateGroup />} />
                   <Route path="school-group" element={<SchoolWideGroupAdmin />} />
+
+                           {/* Teacher routes */}
+                              <Route path="payroll" element={<AccountantDashboard />} />
               
         </Route>
 

@@ -158,6 +158,14 @@ const getSidebarItems = (role) => {
         ...baseItems,
       ];
       break;
+      case 'accountant':
+      items = [
+        { path: '/dashboard', label: 'Dashboard', icon: Home },
+        { path: '/dashboard/payroll', label: 'Payroll', icon: MessageCircle },
+    
+        ...baseItems,
+      ];
+      break;
 
 
     default:
