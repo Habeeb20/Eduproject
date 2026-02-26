@@ -14,7 +14,7 @@ export const getSchoolRecipients = asyncHandler(async (req, res) => {
     const child = await User.findById(user.child || user.children); // Adjust if child is array
     if (!child) return res.status(404).json({ success: false, message: 'Child not found' });
     schoolName = child.schoolName;
-  } else if (user.role === 'student') {
+  } else if (user.role === 'student' || ['teacher', 'admin', 'superadmin'].includes(user.role)) {
     schoolName = user.schoolName;
   } else {
     return res.status(403).json({ success: false, message: 'Unauthorized' });

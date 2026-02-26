@@ -42,6 +42,11 @@ import GroupChat from './pages/dashboard/studentDashboard/GroupChat';
 import SchoolWideGroupAdmin from './pages/dashboard/superAdmin/SchoolGroup';
 import Home from './pages/Home';
 import AccountantDashboard from './pages/dashboard/Accountant/AccountantDashboard';
+import UserDashboard from './pages/dashboard/teacherDashboard/UserAccountDetails';
+import AdminPayrollDashboard from './pages/dashboard/adminDashboard/AdminPayroll';
+import CreateVirtual from './pages/dashboard/teacherDashboard/CreateVirtual';
+import CreateVirtualClass from './pages/dashboard/teacherDashboard/CreateVirtual';
+import MyVirtualClasses from './pages/dashboard/studentDashboard/VirtualClass';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -114,6 +119,8 @@ function App() {
           <Route path="settings" element={<Placeholder title="Settings & Profile" />} />
            <Route path="lesson-notes" element={<LessonNoteReview />} />
            <Route path="text-admin-analytics" element={<AdminExamAnalytics />} />
+           <Route path="admin-get-payrolls" element={<AdminPayrollDashboard />} />
+           
 
 <Route path="/dashboard/digital-ids" element={<AllDigitalIds />} />         {/* Superadmin/Admin */}
 <Route path="/dashboard/my-id" element={<MyDigitalId />} />               {/* All users */}
@@ -129,6 +136,7 @@ function App() {
                <Route path="updates" element={<AnnouncementsFeed />} />
                <Route path="testCBT" element={<TestCBT />} />
                <Route path="group-chat" element={<GroupChat />} />
+               <Route path="virtual-class" element={<MyVirtualClasses/>} />
 
                
             {/* Student routes */}
@@ -143,8 +151,10 @@ function App() {
                <Route path="messages" element={<Messages />} />
                <Route path="create-group" element={<CreateGroup />} />
                   <Route path="school-group" element={<SchoolWideGroupAdmin />} />
+                  <Route path="my-payroll" element={<UserDashboard />} />
+                  <Route path="create-virtual" element={<CreateVirtualClass />} />
 
-                           {/* Teacher routes */}
+                           {/* accountant routes */}
                               <Route path="payroll" element={<AccountantDashboard />} />
               
         </Route>

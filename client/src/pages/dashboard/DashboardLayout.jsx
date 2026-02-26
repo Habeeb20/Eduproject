@@ -11,6 +11,7 @@ import {
   Newspaper,
   BarChart,
   MessageCircle,
+  VideoIcon,
 } from 'lucide-react';
 
 export default function DashboardLayout() {
@@ -70,6 +71,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/create-staff', label: 'Create Staff', icon: Briefcase, restricted: true },
         { path: '/dashboard/school-group', label: 'School Group', icon: Briefcase, restricted: true },
               { path: '/dashboard/create-class', label: 'Create Class', icon: CircleSlash, restricted: true },
+               { path: '/dashboard/admin-get-payrolls', label: 'Admin Payroll', icon: DollarSign },
         { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck, restricted: true },
         { path: '/dashboard/students', label: 'Students', icon: Users, restricted: true },
            { path: '/dashboard/lesson-notes', label: 'Lesson Notes', icon: FileText },
@@ -96,6 +98,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
            { path: '/dashboard/school-group', label: 'School Group', icon: Briefcase, restricted: true },
            { path: '/dashboard/lesson-notes', label: 'Lesson Notes', icon: FileText },
+          
               { path: '/dashboard/messages', label: 'Get Message', icon: MessageCircle },
                       { path: '/dashboard/text-admin-analytics', label: 'CBT Analytics', icon: Newspaper, restricted: true },
         { path: '/dashboard/create-updates', label: 'Post annoucements', icon: Newspaper, restricted: true },
@@ -117,10 +120,13 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
         { path: '/dashboard/create-test', label: 'Create CBTest', icon: FileText },
 
+        { path: '/dashboard/create-virtual', label: 'Create-Virtual', icon: VideoIcon },
         { path: '/dashboard/test-analytics', label: 'Test Analytics', icon: BarChart },
+        { path: '/dashboard/my-payroll', label: 'My Payroll', icon: DollarSign },
         { path: '/dashboard/create-group', label: 'Create Group', icon: Users },
         { path: '/dashboard/school-group', label: 'School Group', icon: Briefcase, restricted: true },
         { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
+                { path: '/dashboard/virtual-class', label: 'Virtual Class', icon: VideoIcon },
         { path: '/dashboard/upload-lesson-note', label: 'Upload Lesson Note', icon: FileText },
            { path: '/dashboard/messages', label: 'Get Messages', icon: MessageCircle },
         { path: '/dashboard/grades', label: 'Grades', icon: FileText },
@@ -137,6 +143,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/updates', label: 'Annoucements', icon: Newspaper },
         { path: '/dashboard/testCBT', label: 'Test CBT', icon: Newspaper },
         { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
+        { path: '/dashboard/virtual-class', label: 'Virtual Class', icon: VideoIcon },
 
         { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
@@ -367,6 +374,7 @@ const getSidebarItems = (role) => {
               </div>
             </div>
           </div>
+
         </header>
 
         <main className="flex-1 p-6 lg:p-8 bg-gray-50">

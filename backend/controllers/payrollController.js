@@ -60,3 +60,59 @@ export const getAllPayrolls = asyncHandler(async (req, res) => {
 
   res.json({ success: true, payrolls });
 });
+
+
+
+
+// controllers/payrollController.js
+export const updatePayroll = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { month, employeeId, salary, bonuses, deductions, netSalary } = req.body;
+
+  const payroll = await Payroll.findById(id);
+  if (!payroll) return res.status(404).json({ success: false, message: 'Payroll not found' });
+
+  // Only accountant who created it or admin/superadmin can edit
+  if (
+    payroll.createdBy.toString() !== req.user._id.toString() &&
+    !['admin', 'superadmin'].includes(req.user.role)
+  ) {
+    return res.status(403).json({ success: false, message: 'Unauthorized to edit this payroll' });
+  }
+
+  payroll.month = month || payroll.month;
+  payroll.employee = employeeId || payroll.employee;
+  payroll.salary = salary ?? payroll.salary;
+  payroll.bonuses = bonuses ?? payroll.bonuses;
+  payroll.deductions = deductions || payroll.deductions;
+  payroll.netSalary = netSalary ?? payroll.netSalary;
+
+  await payroll.save();
+
+  res.json({ success: true, payroll });
+});
+
+
+
+
+
+
+
+export const deletePayroll = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const payroll = await Payroll.findById(id);
+  if (!payroll) return res.status(404).json({ success: false, message: 'Payroll not found' });
+
+  // Only creator or admin/superadmin can delete
+  if (
+    payroll.createdBy.toString() !== req.user._id.toString() &&
+    !['admin', 'superadmin'].includes(req.user.role)
+  ) {
+    return res.status(403).json({ success: false, message: 'Unauthorized to delete this payroll' });
+  }
+
+  await payroll.deleteOne();
+
+  res.json({ success: true, message: 'Payroll deleted' });
+});

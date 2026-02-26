@@ -192,7 +192,7 @@ export const getAllStudents = async (req, res) => {
       schoolName: req.user.schoolName 
     })
     .select('name email studentId class section rollNumber currentClass')
-    .populate('currentClass', 'className section classCode');
+
 
     res.json({ success: true, count: students.length, students });
   } catch (error) {
@@ -244,18 +244,18 @@ export const getAllResults = async (req, res) => {
 };
 
 // GET SCHOOL STAFF (Admin, Accountant, Librarian)
-export const getSchoolStaff = async (req, res) => {
-  try {
-    const staff = await User.find({
-      role: { $in: ['admin', 'accountant', 'librarian'] },
-      schoolName: req.user.schoolName
-    }).select('name email role accountantId librarianId createdAt');
+// export const getSchoolStaff = async (req, res) => {
+//   try {
+//     const staff = await User.find({
+//       role: { $in: ['admin', 'accountant', 'librarian'] },
+//       schoolName: req.user.schoolName
+//     }).select('name email role accountantId librarianId createdAt');
 
-    res.json({ success: true, count: staff.length, staff });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+//     res.json({ success: true, count: staff.length, staff });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 
 
 
@@ -455,5 +455,61 @@ export const getSchoolRecipients =async (req, res) => {
   res.json({
     success: true,
     users, 
+  });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Accountant gets all teachers, admins, superadmins, and other staff in their school
+export const getSchoolStaff = async (req, res) => {
+  const currentUser = req.user;
+
+  // Only accountants should access this (you can adjust roles)
+  if (currentUser.role !== 'accountant') {
+    return res.status(403).json({
+      success: false,
+      message: 'Only accountants can view school staff list',
+    });
+  }
+
+  // Fetch all staff (exclude students, parents, and the accountant themselves)
+  const staff = await User.find({
+    schoolName: currentUser.schoolName,
+    role: { 
+      $in: ['teacher', 'admin', 'superadmin', 'librarian'] // add other staff roles here
+    },
+    _id: { $ne: currentUser._id }, // exclude self
+    isActive: true, // only active users
+  })
+    .select('name email role profilePicture phone isActive createdAt') // fields you want
+    .sort({ role: 1, name: 1 }) // sort by role then name
+    .lean(); // faster response
+
+  // Optional: group by role for frontend convenience
+  const grouped = staff.reduce((acc, user) => {
+    if (!acc[user.role]) acc[user.role] = [];
+    acc[user.role].push(user);
+    return acc;
+  }, {});
+
+  res.json({
+    success: true,
+    total: staff.length,
+    staff,
+    groupedByRole: grouped, // optional - makes frontend rendering easier
   });
 };

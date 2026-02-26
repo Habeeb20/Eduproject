@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Send, Loader2, AlertCircle, Reply } from 'lucide-react';
 import { toast } from 'sonner';
-
+import { MessageCircle } from 'lucide-react';
 export default function Messages() {
   const [conversations, setConversations] = useState([]);
   const [selectedThread, setSelectedThread] = useState(null);
@@ -30,7 +30,7 @@ export default function Messages() {
       setTeachers(res.data.teachers || []);
       setAdmins(res.data.admins || []);
     } catch (err) {
-      toast.error('Failed to load recipients');
+      toast.error(err.response.data?.message || 'Failed to load recipients');
     }
   };
 

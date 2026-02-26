@@ -18,6 +18,8 @@ import testRouter from "./routes/testRoutes.js";
 import messageRoutes from "./routes/messageRoute.js"
 import groupRoutes from "./routes/groupRoute.js";
 import payrollRoutes from "./routes/payrollRoute.js"
+import virtualRouter from "./routes/virtualCall.js"
+import virtualClassRoutes from "./routes/VirtualClassRoute.js"
 dotenv.config();
 
 connectDb()
@@ -62,6 +64,8 @@ app.use("/api/tests", testRouter) // test routes are in testRoutes.js now
 app.use('/api/messages', messageRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/payrolls', payrollRoutes)
+app.use('/api/virtual', virtualRouter) // virtual call routes are in virtualCall.js now
+app.use('/api/virtual-classes', virtualClassRoutes);
 // Start server
 const port = process.env.PORT || 2000;
 
