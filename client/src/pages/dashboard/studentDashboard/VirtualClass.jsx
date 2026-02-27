@@ -97,7 +97,7 @@ const navigate = useNavigate();
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-            {userRole === 'teacher' ? 'My Created Virtual Classes' : 'My Virtual Classes'}
+            {userRole === 'teacher' ? 'My Created Virtual Classes' : ' Virtual Classes'}
           </h1>
 
           {userRole === 'teacher' && (

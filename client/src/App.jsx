@@ -47,6 +47,8 @@ import AdminPayrollDashboard from './pages/dashboard/adminDashboard/AdminPayroll
 import CreateVirtual from './pages/dashboard/teacherDashboard/CreateVirtual';
 import CreateVirtualClass from './pages/dashboard/teacherDashboard/CreateVirtual';
 import MyVirtualClasses from './pages/dashboard/studentDashboard/VirtualClass';
+import TeacherExamDashboard from './pages/dashboard/teacherDashboard/TeacherExamDashboard';
+import CBTStudentInterface from './pages/dashboard/studentDashboard/ExamInterface';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -137,9 +139,10 @@ function App() {
                <Route path="testCBT" element={<TestCBT />} />
                <Route path="group-chat" element={<GroupChat />} />
                <Route path="virtual-class" element={<MyVirtualClasses/>} />
+               <Route path="exam-interface" element={<CBTStudentInterface/>} />
 
                
-            {/* Student routes */}
+            {/* Parent routes */}
          <Route path="messages" element={<Messages />} />
                {/* <Route path="updates" element={<AnnouncementsFeed />} />
                <Route path="testCBT" element={<TestCBT />} /> */}
@@ -153,6 +156,7 @@ function App() {
                   <Route path="school-group" element={<SchoolWideGroupAdmin />} />
                   <Route path="my-payroll" element={<UserDashboard />} />
                   <Route path="create-virtual" element={<CreateVirtualClass />} />
+                  <Route path="exam-paths" element={<TeacherExamDashboard />} />
 
                            {/* accountant routes */}
                               <Route path="payroll" element={<AccountantDashboard />} />

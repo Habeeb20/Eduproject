@@ -12,6 +12,7 @@ import {
   BarChart,
   MessageCircle,
   VideoIcon,
+  FileExclamationPoint,
 } from 'lucide-react';
 
 export default function DashboardLayout() {
@@ -119,6 +120,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/add-score', label: 'Add scores', icon: BookOpen },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
         { path: '/dashboard/create-test', label: 'Create CBTest', icon: FileText },
+        { path: '/dashboard/exam-paths', label: 'Exam', icon: FileExclamationPoint },
 
         { path: '/dashboard/create-virtual', label: 'Create-Virtual', icon: VideoIcon },
         { path: '/dashboard/test-analytics', label: 'Test Analytics', icon: BarChart },
@@ -126,7 +128,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/create-group', label: 'Create Group', icon: Users },
         { path: '/dashboard/school-group', label: 'School Group', icon: Briefcase, restricted: true },
         { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
-                { path: '/dashboard/virtual-class', label: 'Virtual Class', icon: VideoIcon },
+        { path: '/dashboard/virtual-class', label: 'Virtual Class', icon: VideoIcon },
         { path: '/dashboard/upload-lesson-note', label: 'Upload Lesson Note', icon: FileText },
            { path: '/dashboard/messages', label: 'Get Messages', icon: MessageCircle },
         { path: '/dashboard/grades', label: 'Grades', icon: FileText },
