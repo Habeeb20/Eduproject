@@ -49,6 +49,9 @@ import CreateVirtualClass from './pages/dashboard/teacherDashboard/CreateVirtual
 import MyVirtualClasses from './pages/dashboard/studentDashboard/VirtualClass';
 import TeacherExamDashboard from './pages/dashboard/teacherDashboard/TeacherExamDashboard';
 import CBTStudentInterface from './pages/dashboard/studentDashboard/ExamInterface';
+import PublishedExamList from './pages/dashboard/adminDashboard/PublishedExamList';
+import StudentTimetables from './pages/dashboard/studentDashboard/StudentViewExamTimeTable';
+import AdminTimetables from './pages/dashboard/superAdmin/AllExamTimeTable';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -122,6 +125,8 @@ function App() {
            <Route path="lesson-notes" element={<LessonNoteReview />} />
            <Route path="text-admin-analytics" element={<AdminExamAnalytics />} />
            <Route path="admin-get-payrolls" element={<AdminPayrollDashboard />} />
+           <Route path="publishedexams" element={<PublishedExamList/>} />
+           <Route path="exam-timetable" element={<AdminTimetables/>} />
            
 
 <Route path="/dashboard/digital-ids" element={<AllDigitalIds />} />         {/* Superadmin/Admin */}
@@ -139,6 +144,7 @@ function App() {
                <Route path="testCBT" element={<TestCBT />} />
                <Route path="group-chat" element={<GroupChat />} />
                <Route path="virtual-class" element={<MyVirtualClasses/>} />
+               <Route path="exam-timeTable/students" element={<StudentTimetables/>} />
                <Route path="exam-interface" element={<CBTStudentInterface/>} />
 
                

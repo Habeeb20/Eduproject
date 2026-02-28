@@ -1,7 +1,7 @@
 // src/routes/examRoutes.js
 import express from 'express';
-import { protect } from '../middleware/auth.js';
-import { authorize } from '../middleware/authorize.js';
+import { protect, authorize } from '../middleware/auth.js';
+
 
 import {
   // Exam Questions (Teacher)
@@ -22,6 +22,11 @@ import {
   createManualTimetable,
   getAllTimetables,
   getTimetableById,
+  getAllPublishedExams,
+  getTeacherTimetables,
+  getStudentTimetables,
+  updateTimetable,
+  deleteTimetable,
 } from '../controllers/examController.js';
 
 const router = express.Router();
@@ -34,7 +39,7 @@ const router = express.Router();
 router.post(
   '/questions',
   protect,
-  authorize(['teacher']),
+  authorize('teacher'),
   createExamQuestions
 );
 
@@ -42,7 +47,7 @@ router.post(
 router.get(
   '/questions/my',
   protect,
-  authorize(['teacher']),
+  authorize('teacher'),
   getMyExams
 );
 
@@ -50,7 +55,7 @@ router.get(
 router.patch(
   '/questions/:id/publish',
   protect,
-  authorize(['teacher']),
+  authorize('teacher'),
   publishExam
 );
 
@@ -58,7 +63,7 @@ router.patch(
 router.put(
   '/questions/:id',
   protect,
-  authorize(['teacher']),
+  authorize('teacher'),
   updateExamQuestions
 );
 
@@ -66,7 +71,7 @@ router.put(
 router.delete(
   '/questions/:id',
   protect,
-  authorize(['teacher']),
+  authorize('teacher'),
   deleteExam
 );
 
@@ -113,7 +118,7 @@ router.get(
 router.post(
   '/timetable',
   protect,
-  authorize(['admin', 'superadmin']),
+  authorize('admin', 'superadmin'),
   createExamTimetable
 );
 
@@ -132,6 +137,16 @@ router.get(
   getAllTimetables
 );
 
+
+
+router.get('/all-published', protect, authorize('admin', 'superadmin'), getAllPublishedExams);
+
+// Get timetables for teacher's classes
+router.get('/timetable/teacher', protect, authorize('teacher'), getTeacherTimetables);
+
+// Get timetables for student's class
+router.get('/timetable/my', protect, authorize('student'), getStudentTimetables);
+
 // View single timetable details
 router.get(
   '/timetable/:id',
@@ -139,4 +154,7 @@ router.get(
   getTimetableById
 );
 
+
+router.put('/timetable/:id', protect, authorize('admin', 'superadmin'), updateTimetable);
+router.delete('/timetable/:id', protect, authorize('admin', 'superadmin'), deleteTimetable);
 export default router;

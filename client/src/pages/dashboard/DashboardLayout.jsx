@@ -74,6 +74,8 @@ const getSidebarItems = (role) => {
               { path: '/dashboard/create-class', label: 'Create Class', icon: CircleSlash, restricted: true },
                { path: '/dashboard/admin-get-payrolls', label: 'Admin Payroll', icon: DollarSign },
         { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck, restricted: true },
+           { path: '/dashboard/publishedexams', label: 'Set Exam timetable', icon: FileText },
+           { path: '/dashboard/exam-timetable', label: 'Exam Timetable', icon: Calendar },
         { path: '/dashboard/students', label: 'Students', icon: Users, restricted: true },
            { path: '/dashboard/lesson-notes', label: 'Lesson Notes', icon: FileText },
             { path: '/dashboard/messages', label: 'Get Message', icon: MessageCircle },
@@ -99,7 +101,8 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/fees', label: 'Fees & Payments', icon: DollarSign, restricted: true },
            { path: '/dashboard/school-group', label: 'School Group', icon: Briefcase, restricted: true },
            { path: '/dashboard/lesson-notes', label: 'Lesson Notes', icon: FileText },
-          
+           { path: '/dashboard/publishedexams', label: 'Exam questions', icon: FileText },
+                     { path: '/dashboard/exam-timetable', label: 'Exam Timetable', icon: Calendar },
               { path: '/dashboard/messages', label: 'Get Message', icon: MessageCircle },
                       { path: '/dashboard/text-admin-analytics', label: 'CBT Analytics', icon: Newspaper, restricted: true },
         { path: '/dashboard/create-updates', label: 'Post annoucements', icon: Newspaper, restricted: true },
@@ -114,7 +117,7 @@ const getSidebarItems = (role) => {
 
     // Teacher, Student, Parent - no restricted items for now
     case 'teacher':
-      items = [
+      items =[
         { path: '/dashboard', label: 'Dashboard', icon: Home },
         { path: '/dashboard/my-classes', label: 'My Classes', icon: BookOpen },
         { path: '/dashboard/add-score', label: 'Add scores', icon: BookOpen },
@@ -146,6 +149,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/testCBT', label: 'Test CBT', icon: Newspaper },
         { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
         { path: '/dashboard/virtual-class', label: 'Virtual Class', icon: VideoIcon },
+        { path: '/dashboard/exam-timetable/students', label: 'Exam Timetable', icon: Calendar },
 
         { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },

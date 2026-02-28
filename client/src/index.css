@@ -1,2 +1,18 @@
 
 @import "tailwindcss";
+
+/* In your tailwind.config or global.css */
+.prose :where(p):not(:where([class~="not-prose"] *)) {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.tiptap:focus {
+  outline: none;
+}
+.tiptap p.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}

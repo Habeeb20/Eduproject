@@ -20,6 +20,7 @@ import groupRoutes from "./routes/groupRoute.js";
 import payrollRoutes from "./routes/payrollRoute.js"
 import virtualRouter from "./routes/virtualCall.js"
 import virtualClassRoutes from "./routes/VirtualClassRoute.js"
+import examRoutes from "./routes/examRoutes.js"
 dotenv.config();
 
 connectDb()
@@ -66,6 +67,7 @@ app.use('/api/groups', groupRoutes);
 app.use('/api/payrolls', payrollRoutes)
 app.use('/api/virtual', virtualRouter) // virtual call routes are in virtualCall.js now
 app.use('/api/virtual-classes', virtualClassRoutes);
+app.use('/api/exams', examRoutes)
 // Start server
 const port = process.env.PORT || 2000;
 
