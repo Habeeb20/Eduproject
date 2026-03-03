@@ -21,6 +21,8 @@ import payrollRoutes from "./routes/payrollRoute.js"
 import virtualRouter from "./routes/virtualCall.js"
 import virtualClassRoutes from "./routes/VirtualClassRoute.js"
 import examRoutes from "./routes/examRoutes.js"
+import timetableRoutes from './routes/classTimetable.js';
+import libraryRoute from "./routes/libraryRoute.js"
 dotenv.config();
 
 connectDb()
@@ -68,6 +70,10 @@ app.use('/api/payrolls', payrollRoutes)
 app.use('/api/virtual', virtualRouter) // virtual call routes are in virtualCall.js now
 app.use('/api/virtual-classes', virtualClassRoutes);
 app.use('/api/exams', examRoutes)
+app.use("/api/library", libraryRoute)
+
+// Mount under /api/timetables
+app.use('/api/timetables', timetableRoutes);
 // Start server
 const port = process.env.PORT || 2000;
 

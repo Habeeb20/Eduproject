@@ -52,6 +52,11 @@ import CBTStudentInterface from './pages/dashboard/studentDashboard/ExamInterfac
 import PublishedExamList from './pages/dashboard/adminDashboard/PublishedExamList';
 import StudentTimetables from './pages/dashboard/studentDashboard/StudentViewExamTimeTable';
 import AdminTimetables from './pages/dashboard/superAdmin/AllExamTimeTable';
+import ClassTimetableManager from './pages/dashboard/adminDashboard/ClassTimeTable';
+import ClassTimetableView from './pages/dashboard/studentDashboard/ClassTimeTable';
+import LibraryUploadModal from './pages/dashboard/teacherDashboard/UploadLibrary';
+import LibraryView from './pages/dashboard/ViewLibrary';
+import LibraryDashboard from './pages/dashboard/teacherDashboard/Library';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -127,6 +132,7 @@ function App() {
            <Route path="admin-get-payrolls" element={<AdminPayrollDashboard />} />
            <Route path="publishedexams" element={<PublishedExamList/>} />
            <Route path="exam-timetable" element={<AdminTimetables/>} />
+           <Route path="class-timetable" element={<ClassTimetableManager/>} />
            
 
 <Route path="/dashboard/digital-ids" element={<AllDigitalIds />} />         {/* Superadmin/Admin */}
@@ -146,6 +152,7 @@ function App() {
                <Route path="virtual-class" element={<MyVirtualClasses/>} />
                <Route path="exam-timeTable/students" element={<StudentTimetables/>} />
                <Route path="exam-interface" element={<CBTStudentInterface/>} />
+               <Route path="library" element={<LibraryView/>} />
 
                
             {/* Parent routes */}
@@ -163,6 +170,8 @@ function App() {
                   <Route path="my-payroll" element={<UserDashboard />} />
                   <Route path="create-virtual" element={<CreateVirtualClass />} />
                   <Route path="exam-paths" element={<TeacherExamDashboard />} />
+                  <Route path="view-timetable" element={<ClassTimetableView />} />
+                  <Route path="post-library" element={<LibraryDashboard/>} />
 
                            {/* accountant routes */}
                               <Route path="payroll" element={<AccountantDashboard />} />

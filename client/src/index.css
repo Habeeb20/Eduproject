@@ -16,3 +16,63 @@
   pointer-events: none;
   height: 0;
 }
+
+
+
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  .print\\:bg-white {
+    background: white !important;
+  }
+
+  .print\\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  .print\\:border-none {
+    border: none !important;
+  }
+
+  .print\\:p-0 {
+    padding: 0 !important;
+  }
+
+  .print\\:text-black {
+    color: black !important;
+  }
+
+  .min-h-screen {
+    min-height: auto !important;
+  }
+
+  /* Hide unnecessary elements */
+  nav, footer, button, .no-print {
+    display: none !important;
+  }
+
+  /* Make timetable clean */
+  .rounded-3xl {
+    border-radius: 0 !important;
+  }
+
+  h1, h2, h3 {
+    color: black !important;
+  }
+
+  .bg-gradient-to-r {
+    background: none !important;
+  }
+
+  .bg-gray-50, .bg-white {
+    background: white !important;
+  }
+}
