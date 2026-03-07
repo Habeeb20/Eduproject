@@ -116,8 +116,6 @@ export const submitAnswer = asyncHandler(async (req, res) => {
 
 
 
-
-// POST /api/tests/:testId/attempt/:attemptId/finish
 // export const finishTest = asyncHandler(async (req, res) => {
 //   const { testId, attemptId } = req.params;
 
@@ -129,9 +127,12 @@ export const submitAnswer = asyncHandler(async (req, res) => {
 //   const test = await Test.findById(testId);
 //   if (!test) return res.status(404).json({ success: false, message: "Test not found" });
 
+//   // Safety: ensure answers is a Map (fallback to empty Map if broken)
+//   const answersMap = attempt.answers instanceof Map ? attempt.answers : new Map(Object.entries(attempt.answers || {}));
+
 //   let correct = 0;
 //   test.questions.forEach((q, i) => {
-//     const studentAnswer = attempt.answers.get(i.toString());
+//     const studentAnswer = answersMap.get(i.toString());
 //     if (studentAnswer === q.correctOption) correct++;
 //   });
 
@@ -154,6 +155,8 @@ export const submitAnswer = asyncHandler(async (req, res) => {
 // });
 
 
+// GET /api/tests/:testId/results
+
 
 export const finishTest = asyncHandler(async (req, res) => {
   const { testId, attemptId } = req.params;
@@ -166,16 +169,50 @@ export const finishTest = asyncHandler(async (req, res) => {
   const test = await Test.findById(testId);
   if (!test) return res.status(404).json({ success: false, message: "Test not found" });
 
-  // Safety: ensure answers is a Map (fallback to empty Map if broken)
-  const answersMap = attempt.answers instanceof Map ? attempt.answers : new Map(Object.entries(attempt.answers || {}));
+  // ────────────────────────────────────────────────────────
+  // Normalize answers to a Map with STRING keys (fixes the issue)
+  // This handles BOTH numeric keys (from frontend) and string keys
+  // ────────────────────────────────────────────────────────
+  const answersMap = new Map();
+
+  if (attempt.answers) {
+    // Convert whatever came from DB (Map or object) to string-keyed Map
+    const entries = attempt.answers instanceof Map 
+      ? Array.from(attempt.answers.entries())
+      : Object.entries(attempt.answers);
+
+    entries.forEach(([key, value]) => {
+      answersMap.set(String(key), value);  // Force key to be string
+    });
+  }
+
+  // Debug logs (remove after testing)
+  console.log('Normalized answers keys:', Array.from(answersMap.keys()));
+  console.log('Normalized answers values:', Array.from(answersMap.values()));
 
   let correct = 0;
-  test.questions.forEach((q, i) => {
-    const studentAnswer = answersMap.get(i.toString());
-    if (studentAnswer === q.correctOption) correct++;
+
+  test.questions.forEach((q, index) => {
+    // Try both string and number key (covers all cases)
+    let studentAnswer = answersMap.get(String(index));   // "0", "1", ...
+
+    if (studentAnswer === undefined) {
+      studentAnswer = answersMap.get(index);            // 0, 1, ... (fallback)
+    }
+
+    // More debug
+    console.log(
+      `Q${index}: Student = "${studentAnswer || 'undefined'}", Correct = "${q.correctOption}"`
+    );
+
+    if (studentAnswer === q.correctOption) {
+      correct++;
+    }
   });
 
-  const percentage = Math.round((correct / test.totalQuestions) * 100);
+  const percentage = test.totalQuestions > 0 
+    ? Math.round((correct / test.totalQuestions) * 100) 
+    : 0;
 
   attempt.score = correct;
   attempt.totalQuestions = test.totalQuestions;
@@ -193,8 +230,6 @@ export const finishTest = asyncHandler(async (req, res) => {
   });
 });
 
-
-// GET /api/tests/:testId/results
 export const getTestResults = asyncHandler(async (req, res) => {
   const { testId } = req.params;
 
@@ -251,6 +286,29 @@ console.log(tests)
 
 
 
+export const updateAttemptProgress = asyncHandler(async (req, res) => {
+  const { testId, attemptId } = req.params;
+  const { answers } = req.body;
+
+  const attempt = await TestAttempt.findById(attemptId);
+  if (!attempt || attempt.student.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  if (answers) {
+    // Normalize keys to strings
+    const normalized = new Map();
+    Object.entries(answers).forEach(([key, value]) => {
+      normalized.set(String(key), value);
+    });
+    attempt.answers = normalized;
+  }
+
+  await attempt.save();
+
+  res.json({ success: true, message: 'Progress saved' });
+});
+
 // controllers/testController.js
 export const getMyTests = asyncHandler(async (req, res) => {
   if (req.user.role !== 'teacher') {
@@ -284,4 +342,60 @@ export const getAllTests = asyncHandler(async (req, res) => {
     .lean();
 
   res.json({ success: true, tests });
+});
+
+
+
+
+
+
+
+
+
+
+export const getStudentTestAttempts = asyncHandler(async (req, res) => {
+  const { studentId } = req.params;
+  const { subject } = req.query;
+
+  const user = req.user;
+
+
+  let filter = { student: studentId, status: 'completed' };
+
+
+  if (subject) {
+    // Find test IDs that match the subject
+    const matchingTests = await Test.find({ subject }).select('_id');
+    const testIds = matchingTests.map(t => t._id);
+
+    filter.test = { $in: testIds };
+  }
+
+  const attempts = await TestAttempt.find(filter)
+    .populate({
+      path: 'test',
+      select: 'title subject totalQuestions durationMinutes createdAt',
+    })
+    .sort({ finishedAt: -1 }) // newest first
+    .lean();
+
+  // Optional: format response
+  const formattedAttempts = attempts.map(attempt => ({
+    _id: attempt._id,
+    testTitle: attempt.test?.title || 'Untitled Test',
+    subject: attempt.test?.subject || 'Unknown',
+    score: attempt.score,
+    totalQuestions: attempt.totalQuestions,
+    percentage: attempt.percentage,
+    timeTakenSeconds: attempt.timeTakenSeconds,
+    startedAt: attempt.startedAt,
+    finishedAt: attempt.finishedAt,
+    answers: attempt.answers, // Map of questionId → answer
+  }));
+
+  res.json({
+    success: true,
+    attempts: formattedAttempts,
+    count: formattedAttempts.length,
+  });
 });

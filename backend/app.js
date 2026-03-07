@@ -23,6 +23,7 @@ import virtualClassRoutes from "./routes/VirtualClassRoute.js"
 import examRoutes from "./routes/examRoutes.js"
 import timetableRoutes from './routes/classTimetable.js';
 import libraryRoute from "./routes/libraryRoute.js"
+import computedRoute from "./routes/markComputedRoute.js"
 dotenv.config();
 
 connectDb()
@@ -71,7 +72,7 @@ app.use('/api/virtual', virtualRouter) // virtual call routes are in virtualCall
 app.use('/api/virtual-classes', virtualClassRoutes);
 app.use('/api/exams', examRoutes)
 app.use("/api/library", libraryRoute)
-
+app.use('/api/computed-score', computedRoute)
 // Mount under /api/timetables
 app.use('/api/timetables', timetableRoutes);
 // Start server

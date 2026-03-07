@@ -57,6 +57,9 @@ import ClassTimetableView from './pages/dashboard/studentDashboard/ClassTimeTabl
 import LibraryUploadModal from './pages/dashboard/teacherDashboard/UploadLibrary';
 import LibraryView from './pages/dashboard/ViewLibrary';
 import LibraryDashboard from './pages/dashboard/teacherDashboard/Library';
+import TeacherScorePublisher from './pages/dashboard/teacherDashboard/ComputationOfResults';
+import StudentReportCard from './pages/dashboard/studentDashboard/StudentReportCard';
+import ReportCardPublisher from './pages/dashboard/teacherDashboard/ReportCardPublisher';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -136,7 +139,7 @@ function App() {
            
 
 <Route path="/dashboard/digital-ids" element={<AllDigitalIds />} />         {/* Superadmin/Admin */}
-<Route path="/dashboard/my-id" element={<MyDigitalId />} />               {/* All users */}
+           {/* All users */}
 
           {/* Role-specific dashboards (you can replace placeholders later) */}
           <Route path="superadmin" element={<SuperadminDashboardOverview />} />
@@ -153,7 +156,8 @@ function App() {
                <Route path="exam-timeTable/students" element={<StudentTimetables/>} />
                <Route path="exam-interface" element={<CBTStudentInterface/>} />
                <Route path="library" element={<LibraryView/>} />
-
+               <Route path="see-computed-scores" element={<StudentReportCard/>} />
+                <Route path="my-id" element={<MyDigitalId />} />    
                
             {/* Parent routes */}
          <Route path="messages" element={<Messages />} />
@@ -172,6 +176,8 @@ function App() {
                   <Route path="exam-paths" element={<TeacherExamDashboard />} />
                   <Route path="view-timetable" element={<ClassTimetableView />} />
                   <Route path="post-library" element={<LibraryDashboard/>} />
+                  <Route path="teacher-compute-mark" element={<TeacherScorePublisher/>} />
+                  <Route path="publish-report" element={<ReportCardPublisher/>} />
 
                            {/* accountant routes */}
                               <Route path="payroll" element={<AccountantDashboard />} />

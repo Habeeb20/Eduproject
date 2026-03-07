@@ -5,7 +5,7 @@ const attemptSchema = new mongoose.Schema({
 answers: { 
     type: Map, 
     of: String, 
-    default: () => new Map()   // ← This is the fix
+    default: () => new Map()   
   },
   score: { type: Number },
   totalQuestions: { type: Number },
@@ -15,5 +15,17 @@ answers: {
   finishedAt: { type: Date },
   status: { type: String, enum: ["in_progress", "completed"], default: "in_progress" },
 }, { timestamps: true });
+
+// models/TestAttempt.js
+attemptSchema.pre('save', function (next) {
+  if (this.answers instanceof Map) {
+    const normalized = new Map();
+    for (const [key, value] of this.answers) {
+      normalized.set(String(key), value); // always string keys
+    }
+    this.answers = normalized;
+  }
+
+});
 
 export default mongoose.model("TestAttempt", attemptSchema);

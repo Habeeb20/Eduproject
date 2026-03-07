@@ -162,28 +162,79 @@ export default function TestCBT() {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [phase, cheatWarning]);
 
-  const selectOption = (option) => {
-    setAnswers((prev) => ({ ...prev, [currentQuestion]: option }));
-  };
+const selectOption = (option) => {
+  setAnswers(prev => {
+    const newAnswers = { ...prev, [currentQuestion]: option };
+    
+    // Auto-save to backend (debounced or immediate)
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/tests/${selectedTestId}/attempt/${attempt._id}/update`,
+      { answers: newAnswers },
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    ).catch(err => console.error('Auto-save failed', err));
+
+    return newAnswers;
+  });
+};
+  // const finishTest = async (cheating = false) => {
+  //   if (!selectedTestId || !attempt?._id) return;
+
+  //   try {
+  //     const res = await axios.post(
+  //       `${import.meta.env.VITE_BACKEND_URL}/tests/${selectedTestId}/attempt/${attempt._id}/finish`,
+  //       { cheating, answers },
+  //       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+  //     );
+
+  //     setScore(res.data.score);
+  //     console.log(answers)
+  //     localStorage.removeItem(`test_progress_${selectedTestId}`);
+  //     toast.success(`Test completed! Score: ${res.data.score.percentage}%`);
+  //     setPhase('result');
+  //   } catch (err) {
+  //     toast.error('Failed to submit test');
+  //   }
+  // };
+
+
 
   const finishTest = async (cheating = false) => {
-    if (!selectedTestId || !attempt?._id) return;
+  if (!selectedTestId || !attempt?._id) return;
 
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/tests/${selectedTestId}/attempt/${attempt._id}/finish`,
-        { cheating },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
+  // ──── SUPER IMPORTANT DEBUG ────
+  console.log('=== FINISH TEST PAYLOAD DEBUG ===');
+  console.log('Attempt ID:', attempt._id);
+  console.log('Current answers state:', answers);
+  console.log('Stringified answers:', JSON.stringify(answers));
+  console.log('Cheating flag:', cheating);
 
-      setScore(res.data.score);
-      localStorage.removeItem(`test_progress_${selectedTestId}`);
-      toast.success(`Test completed! Score: ${res.data.score.percentage}%`);
-      setPhase('result');
-    } catch (err) {
-      toast.error('Failed to submit test');
-    }
+  const payload = {
+    cheating,
+    answers,  // ← make sure this is here
   };
+
+  console.log('Full payload being sent:', payload);
+  console.log('Payload keys:', Object.keys(payload));
+  console.log('Answers keys in payload:', Object.keys(payload.answers || {}));
+
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/tests/${selectedTestId}/attempt/${attempt._id}/finish`,
+      payload,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+
+    console.log('Backend response:', res.data);
+
+    setScore(res.data.score);
+    localStorage.removeItem(`test_progress_${selectedTestId}`);
+    toast.success(`Test completed! Score: ${res.data.score.percentage}%`);
+    setPhase('result');
+  } catch (err) {
+    console.error('Finish test error:', err.response?.data || err.message);
+    toast.error('Failed to submit test');
+  }
+};
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);

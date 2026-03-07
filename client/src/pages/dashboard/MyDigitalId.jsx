@@ -12,7 +12,7 @@ export default function MyDigitalId() {
   useEffect(() => {
     const fetchMyProfile = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/me`, {
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         setUser(res.data.user);

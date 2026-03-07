@@ -439,7 +439,7 @@ export const getAllStudents1 = async (req, res) => {
 export const getSchoolRecipients =async (req, res) => {
   const user = req.user;
 
-  if (!['admin', 'superadmin'].includes(user.role)) {
+  if (!['admin', 'superadmin', 'teacher'].includes(user.role)) {
     return res.status(403).json({ success: false, message: 'Only admins/superadmins can access this' });
   }
 

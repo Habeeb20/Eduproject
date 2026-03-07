@@ -135,9 +135,11 @@ const getSidebarItems = (role) => {
    { path: '/dashboard/view-timetable', label: 'class Timetable', icon: Calendar },
         { path: '/dashboard/create-virtual', label: 'Create-Virtual', icon: VideoIcon },
         { path: '/dashboard/post-library', label: 'post to Library', icon: LibraryIcon },
-        { path: '/dashboard/test-analytics', label: 'Test Analytics', icon: BarChart },
+        { path: '/dashboard/test-analytics', label: 'CBT Test Analytics', icon: BarChart },
         { path: '/dashboard/my-payroll', label: 'My Payroll', icon: DollarSign },
           { path: '/dashboard/library', label: 'Library', icon:LibraryIcon },
+          { path: '/dashboard/teacher-compute-mark', label: 'Compute Scores', icon:LibraryIcon },
+          { path: '/dashboard/publish-report', label: 'Publish Report Card', icon:LibraryIcon },
         { path: '/dashboard/create-group', label: 'Create Group', icon: Users },
         
         { path: '/dashboard/school-group', label: 'School Group', icon: Briefcase },
@@ -156,16 +158,18 @@ const getSidebarItems = (role) => {
       items = [
         { path: '/dashboard', label: 'Dashboard', icon: Home },
         { path: '/dashboard/profile', label: 'My Profile', icon: User },
+     
         { path: '/dashboard/updates', label: 'Annoucements', icon: Newspaper },
         { path: '/dashboard/testCBT', label: 'Test CBT', icon: Newspaper },
         { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
         { path: '/dashboard/virtual-class', label: 'Virtual Class', icon: VideoIcon },
+           { path: '/dashboard/see-computed-scores', label: 'Report Cards', icon: User },
         { path: '/dashboard/exam-timetable/students', label: 'Exam Timetable', icon: Calendar },
         { path: '/dashboard/view-timetable', label: 'class Timetable', icon: Calendar },
   { path: '/dashboard/library', label: 'Library', icon:LibraryIcon, restricted: true },
         { path: '/dashboard/grades', label: 'Grades / Results', icon: FileText },
         { path: '/dashboard/attendance', label: 'Attendance', icon: Calendar },
-           { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
+           { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim,  },
         ...baseItems,
       ];
       break;

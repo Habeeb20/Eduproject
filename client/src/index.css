@@ -76,3 +76,70 @@
     background: white !important;
   }
 }
+
+
+/* Classic */
+.report-classic table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.report-classic th, .report-classic td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+.report-classic th {
+  background-color: #4f46e5;
+  color: white;
+}
+
+/* Modern */
+.report-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.report-modern .subject-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+/* Minimal */
+.report-minimal {
+  font-family: 'Georgia', serif;
+  line-height: 1.6;
+}
+.report-minimal h2 {
+  text-align: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
+}
+
+
+
+/* Print styles */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  .shadow-2xl { box-shadow: none !important; }
+  .rounded-3xl { border-radius: 0 !important; }
+  .bg-gradient-to-br { background: white !important; }
+  .border { border-color: #ddd !important; }
+}
+
+/* Card hover effect */
+.hover\\:shadow-2xl:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  .shadow-2xl { box-shadow: none !important; }
+  .rounded-3xl { border-radius: 0 !important; }
+  .bg-gradient-to-br { background: white !important; }
+  .border { border-color: #ddd !important; }
+}
