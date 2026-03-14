@@ -77,11 +77,13 @@ const getSidebarItems = (role) => {
               { path: '/dashboard/library', label: 'Library', icon:LibraryIcon, restricted: true },
                { path: '/dashboard/admin-get-payrolls', label: 'Admin Payroll', icon: DollarSign },
         { path: '/dashboard/all-users', label: 'All Users', icon: UserCheck, restricted: true },
+        { path: '/dashboard/users', label: 'Manage Users', icon: UserCheck, restricted: true },
            { path: '/dashboard/publishedexams', label: 'Set Exam timetable', icon: FileText },
            { path: '/dashboard/exam-timetable', label: 'Exam Timetable', icon: Calendar },
            { path: '/dashboard/class-timetable', label: 'Class Timetable', icon: Calendar },
         { path: '/dashboard/students', label: 'Students', icon: Users, restricted: true },
            { path: '/dashboard/lesson-notes', label: 'Lesson Notes', icon: FileText },
+           { path: '/dashboard/create-template', label: 'create template', icon: FileText },
            
             { path: '/dashboard/messages', label: 'Get Message', icon: MessageCircle },
         { path: '/dashboard/check-score', label: 'Check Score', icon: MarsStroke, restricted: true },
@@ -111,6 +113,7 @@ const getSidebarItems = (role) => {
              { path: '/dashboard/library', label: 'Library', icon:LibraryIcon, restricted: true },
                      { path: '/dashboard/exam-timetable', label: 'Exam Timetable', icon: Calendar },
                                 { path: '/dashboard/class-timetable', label: 'Class Timetable', icon: Calendar },
+                                    { path: '/dashboard/users', label: 'Manage Users', icon: UserCheck, restricted: true },
               { path: '/dashboard/messages', label: 'Get Message', icon: MessageCircle },
                       { path: '/dashboard/text-admin-analytics', label: 'CBT Analytics', icon: Newspaper, restricted: true },
         { path: '/dashboard/create-updates', label: 'Post annoucements', icon: Newspaper, restricted: true },
@@ -120,6 +123,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/create-class', label: 'Create Class', icon: CircleSlash, restricted: true },
         { path: '/dashboard/reports', label: 'Reports', icon: FileText, restricted: true },
         { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
+          { path: '/dashboard/create-template', label: 'create template', icon: FileText },
       ];
       break;
 
@@ -141,6 +145,7 @@ const getSidebarItems = (role) => {
           { path: '/dashboard/teacher-compute-mark', label: 'Compute Scores', icon:LibraryIcon },
           { path: '/dashboard/publish-report', label: 'Publish Report Card', icon:LibraryIcon },
         { path: '/dashboard/create-group', label: 'Create Group', icon: Users },
+        { path: '/dashboard/request', label: 'Request for leave', icon: Users },
         
         { path: '/dashboard/school-group', label: 'School Group', icon: Briefcase },
         { path: '/dashboard/group-chat', label: 'Group Chat', icon: MessageCircle },
@@ -148,7 +153,7 @@ const getSidebarItems = (role) => {
         { path: '/dashboard/upload-lesson-note', label: 'Upload Lesson Note', icon: FileText },
            { path: '/dashboard/messages', label: 'Get Messages', icon: MessageCircle },
         { path: '/dashboard/grades', label: 'Grades', icon: FileText },
-           { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, restricted: true },
+           { path: '/dashboard/my-id', label: 'Digital Card', icon: CardSim, },
         ...baseItems,
       ];
       break;

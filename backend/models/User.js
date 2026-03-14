@@ -92,6 +92,34 @@ needsPasswordReset: { type: Boolean, default: false },
     type: String, // Cloudinary secure URL
     default: 'https://res.cloudinary.com/your-cloud-name/image/upload/v1/default-avatar.png',
   },
+
+
+
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  blockedAt: Date,
+  blockedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  blockReason: String,
+
+  // NEW: separate deactivation field
+  isDeactivated: {
+    type: Boolean,
+    default: false,
+  },
+  deactivatedAt: Date,
+  deactivatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  deactivateReason: String,
+
+  // Optional: soft delete (already have)
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: Date,
+
+
+
+
+
   },
 
   { timestamps: true }

@@ -57,7 +57,11 @@ import { createSchoolAdmin,   createTeacher,
   getAllUsersInSchool,
   updateUser,
   deleteUser,
-  getAllStudents, } from '../controllers/adminControllers.js';
+  getAllStudents,
+  getAllUsers,
+  softDeleteUser,
+  toggleBlockUser,
+  toggleDeactivateUser, } from '../controllers/adminControllers.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 const adminRouter = express.Router();
@@ -110,9 +114,30 @@ adminRouter.post(
 
 adminRouter.get('/superadmin-stats', protect, authorize('superadmin'), getSuperadminStats);
 adminRouter.get('/users/school', protect, authorize('superadmin'), getAllUsersInSchool);
-adminRouter.put('/users/:id', protect, authorize(['admin', 'superadmin']), updateUser);
-adminRouter.delete('/users/:id', protect, authorize(['admin', 'superadmin']), deleteUser);
+adminRouter.put('/users/:id', protect, authorize('admin', 'superadmin'), updateUser);
+adminRouter.delete('/users/:id', protect, authorize('admin', 'superadmin'), deleteUser);
 adminRouter.get('/students', protect, authorize('superadmin', 'admin'), getAllStudents);
 adminRouter.post("/login", login)
+
+
+// Admin & Superadmin only
+adminRouter.use(protect, authorize('admin', 'superadmin'));
+
+adminRouter
+  .route('/:userId/block')
+  .put(toggleBlockUser);           // POST or PUT body: { block: true/false, reason: "..." }
+
+adminRouter
+  .route('/:userId/delete')
+  .delete(softDeleteUser);         // Soft delete
+
+adminRouter
+  .route('/users')
+  .get(getAllUsers);  
+  
+
+adminRouter
+  .route('/:userId/deactivate')
+  .put(protect, authorize('admin', 'superadmin'), toggleDeactivateUser);
 
 export default adminRouter;

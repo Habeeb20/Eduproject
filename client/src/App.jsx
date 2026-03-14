@@ -60,6 +60,9 @@ import LibraryDashboard from './pages/dashboard/teacherDashboard/Library';
 import TeacherScorePublisher from './pages/dashboard/teacherDashboard/ComputationOfResults';
 import StudentReportCard from './pages/dashboard/studentDashboard/StudentReportCard';
 import ReportCardPublisher from './pages/dashboard/teacherDashboard/ReportCardPublisher';
+import RequestsDashboard from './pages/dashboard/teacherDashboard/RequestDashboard';
+import AdminRequestTemplates from './pages/dashboard/superAdmin/LeaveRequests';
+import UserManagementDashboard from './pages/dashboard/superAdmin/UserManagement';
 
 // Placeholder for sections without content yet
 const Placeholder = ({ title }) => (
@@ -136,6 +139,8 @@ function App() {
            <Route path="publishedexams" element={<PublishedExamList/>} />
            <Route path="exam-timetable" element={<AdminTimetables/>} />
            <Route path="class-timetable" element={<ClassTimetableManager/>} />
+           <Route path="create-template" element={<AdminRequestTemplates/>} />
+           <Route path="users" element={<UserManagementDashboard/>} />
            
 
 <Route path="/dashboard/digital-ids" element={<AllDigitalIds />} />         {/* Superadmin/Admin */}
@@ -178,6 +183,7 @@ function App() {
                   <Route path="post-library" element={<LibraryDashboard/>} />
                   <Route path="teacher-compute-mark" element={<TeacherScorePublisher/>} />
                   <Route path="publish-report" element={<ReportCardPublisher/>} />
+                  <Route path="request" element={<RequestsDashboard/>} />
 
                            {/* accountant routes */}
                               <Route path="payroll" element={<AccountantDashboard />} />

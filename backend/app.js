@@ -24,6 +24,7 @@ import examRoutes from "./routes/examRoutes.js"
 import timetableRoutes from './routes/classTimetable.js';
 import libraryRoute from "./routes/libraryRoute.js"
 import computedRoute from "./routes/markComputedRoute.js"
+import requestRouter from "./routes/requestRoute.js"
 dotenv.config();
 
 connectDb()
@@ -75,6 +76,7 @@ app.use("/api/library", libraryRoute)
 app.use('/api/computed-score', computedRoute)
 // Mount under /api/timetables
 app.use('/api/timetables', timetableRoutes);
+app.use('/api/request', requestRouter)
 // Start server
 const port = process.env.PORT || 2000;
 

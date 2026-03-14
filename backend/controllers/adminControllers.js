@@ -600,6 +600,194 @@ export const getAllStudents = asyncHandler(async (req, res) => {
 
 
 
+export const toggleBlockUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { block, reason } = req.body; // block: true/false, reason: optional string
+
+  const admin = req.user;
+  if (!['admin', 'superadmin'].includes(admin.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+
+  // Prevent blocking admins/superadmins (optional safety)
+  if (['admin', 'superadmin'].includes(user.role)) {
+    return res.status(403).json({ success: false, message: 'Cannot block admin accounts' });
+  }
+
+  // Ensure same school (security)
+  if (user.schoolName !== admin.schoolName) {
+    return res.status(403).json({ success: false, message: 'User not in your school' });
+  }
+
+  user.isBlocked = !!block;
+  user.blockedAt = block ? new Date() : null;
+  user.blockedBy = block ? admin._id : null;
+  user.blockReason = block ? (reason || 'No reason provided') : null;
+
+  await user.save();
+
+  res.json({
+    success: true,
+    message: `User ${block ? 'blocked' : 'unblocked'} successfully`,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isBlocked: user.isBlocked,
+      blockedAt: user.blockedAt,
+      blockReason: user.blockReason,
+    },
+  });
+});
+
+// 2. Soft Delete user (mark as deleted, don't actually remove from DB)
+export const softDeleteUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const admin = req.user;
+  if (!['admin', 'superadmin'].includes(admin.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+
+  if (['admin', 'superadmin'].includes(user.role)) {
+    return res.status(403).json({ success: false, message: 'Cannot delete admin accounts' });
+  }
+
+  if (user.schoolName !== admin.schoolName) {
+    return res.status(403).json({ success: false, message: 'User not in your school' });
+  }
+
+  if (user.isDeleted) {
+    return res.status(400).json({ success: false, message: 'User already deleted' });
+  }
+
+  user.isDeleted = true;
+  user.deletedAt = new Date();
+
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'User account soft-deleted successfully',
+    userId: user._id,
+  });
+});
+
+// 3. Get all users (with filters) - for admin dashboard
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const admin = req.user;
+  if (!['admin', 'superadmin'].includes(admin.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const { role, isBlocked, page = 1, limit = 20 } = req.query;
+
+  const query = { schoolName: admin.schoolName };
+
+  if (role) query.role = role;
+  if (isBlocked !== undefined) query.isBlocked = isBlocked === 'true';
+
+  const users = await User.find(query)
+    .select('-password') // never return password
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
+
+  const total = await User.countDocuments(query);
+
+  res.json({
+    success: true,
+    users,
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      pages: Math.ceil(total / limit),
+    },
+  });
+});
+
+export const toggleDeactivateUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { deactivate, reason } = req.body; // { deactivate: true/false, reason?: string }
+
+  const admin = req.user;
+  if (!['admin', 'superadmin'].includes(admin.role)) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  // Safety checks
+  if (['admin', 'superadmin'].includes(user.role)) {
+    return res.status(403).json({ message: 'Cannot deactivate admin accounts' });
+  }
+
+  if (user.schoolName !== admin.schoolName) {
+    return res.status(403).json({ message: 'User not in your school' });
+  }
+
+  user.isDeactivated = !!deactivate;
+  user.deactivatedAt = deactivate ? new Date() : null;
+  user.deactivatedBy = deactivate ? admin._id : null;
+  user.deactivateReason = deactivate ? (reason || 'No reason provided') : null;
+
+  await user.save();
+
+  res.json({
+    success: true,
+    message: `Account ${deactivate ? 'deactivated' : 'reactivated'} successfully`,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isDeactivated: user.isDeactivated,
+      deactivatedAt: user.deactivatedAt,
+      deactivateReason: user.deactivateReason,
+    },
+  });
+});
+
+// Optional: Combined block + deactivate check in login middleware
+export const checkAccountStatus = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return next(); // let normal auth fail
+
+  if (user.isBlocked) {
+    return res.status(403).json({
+      message: `Your account is blocked. Reason: ${user.blockReason || 'Contact school admin'}`,
+    });
+  }
+
+  if (user.isDeactivated) {
+    return res.status(403).json({
+      message: `Your account has been deactivated. Reason: ${user.deactivateReason || 'Contact school admin'}`,
+    });
+  }
+
+  next();
+});
+
+
+
+
+
+
+
+
 
 
 

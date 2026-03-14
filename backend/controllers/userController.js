@@ -63,6 +63,10 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
 
+   if(user.isBlocked || user.usDeactivated || user.isDeleted){
+    return res.status(400).json({message: "your account has either being deactivated, blocked or deleted, reach out to your Admin"})
+   }
+
     res.json({
       success: true,
       token: generateToken(user._id),
